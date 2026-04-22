@@ -1,0 +1,682 @@
+﻿@{
+    ViewData["Title"] = "Home";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Club BAIST — Private Golf Club</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #B8972E;
+            --gold-light: #D4B96A;
+            --gold-pale: #F5EDD6;
+            --dark: #1C1C1C;
+            --mid: #6B6B6B;
+            --border: #E8E3DA;
+            --bg: #FAFAF8;
+            --white: #FFFFFF;
+            --cream: #F7F4EE;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Jost', sans-serif;
+            font-weight: 300;
+            background-color: var(--white);
+            color: var(--dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ---- TOP NAV ---- */
+        .home-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 4rem;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .home-brand {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--dark);
+            text-decoration: none;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+            .home-brand em {
+                color: var(--gold);
+                font-style: normal;
+            }
+
+        .home-nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            list-style: none;
+        }
+
+            .home-nav-links a {
+                color: var(--mid);
+                text-decoration: none;
+                font-size: 0.72rem;
+                letter-spacing: 2px;
+                text-transform: uppercase;
+                transition: color 0.2s;
+            }
+
+                .home-nav-links a:hover {
+                    color: var(--dark);
+                }
+
+            .home-nav-links .login-btn {
+                border: 1px solid var(--gold);
+                color: var(--gold);
+                padding: 8px 24px;
+                transition: all 0.2s;
+                border-radius: 2px;
+            }
+
+                .home-nav-links .login-btn:hover {
+                    background-color: var(--gold);
+                    color: var(--white);
+                }
+
+        /* ---- HERO ---- */
+        .hero {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            position: relative;
+        }
+
+        /* Left panel — content */
+        .hero-left {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 8rem 5rem 4rem;
+            background-color: var(--white);
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-eyebrow {
+            font-size: 0.65rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            animation: fadeUp 0.7s ease 0.2s forwards;
+        }
+
+        .hero-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(3.5rem, 6vw, 6rem);
+            font-weight: 300;
+            line-height: 0.95;
+            color: var(--dark);
+            margin-bottom: 1rem;
+            opacity: 0;
+            animation: fadeUp 0.7s ease 0.4s forwards;
+        }
+
+            .hero-title em {
+                font-style: italic;
+                color: var(--gold);
+            }
+
+        .hero-divider {
+            width: 48px;
+            height: 2px;
+            background: var(--gold);
+            margin: 1.8rem 0;
+            opacity: 0;
+            animation: fadeIn 0.7s ease 0.6s forwards;
+        }
+
+        .hero-desc {
+            font-size: 0.9rem;
+            color: var(--mid);
+            line-height: 1.9;
+            max-width: 380px;
+            margin-bottom: 2.5rem;
+            opacity: 0;
+            animation: fadeUp 0.7s ease 0.7s forwards;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            opacity: 0;
+            animation: fadeUp 0.7s ease 0.9s forwards;
+        }
+
+        .btn-hero-primary {
+            background-color: var(--dark);
+            color: var(--white);
+            padding: 14px 36px;
+            font-family: 'Jost', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 500;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            text-decoration: none;
+            border-radius: 2px;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+
+            .btn-hero-primary:hover {
+                background-color: var(--gold);
+                color: var(--white);
+                transform: translateY(-2px);
+                box-shadow: 0 8px 24px rgba(184,151,46,0.3);
+            }
+
+        .btn-hero-secondary {
+            background-color: transparent;
+            color: var(--dark);
+            padding: 14px 36px;
+            font-family: 'Jost', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 400;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            text-decoration: none;
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+
+            .btn-hero-secondary:hover {
+                border-color: var(--gold);
+                color: var(--gold);
+                transform: translateY(-2px);
+            }
+
+        /* Right panel — visual */
+        .hero-right {
+            background-color: var(--cream);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            /* Decorative golf course pattern */
+            .hero-right::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: radial-gradient(circle at 30% 40%, rgba(184,151,46,0.08) 0%, transparent 60%), radial-gradient(circle at 70% 70%, rgba(184,151,46,0.05) 0%, transparent 50%);
+            }
+
+        .hero-visual {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 4rem;
+        }
+
+        .hero-number {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 18rem;
+            font-weight: 300;
+            color: rgba(184,151,46,0.08);
+            line-height: 1;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            user-select: none;
+            pointer-events: none;
+        }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            max-width: 360px;
+            opacity: 0;
+            animation: fadeIn 0.8s ease 1s forwards;
+        }
+
+        .hero-stat {
+            background: var(--white);
+            padding: 2rem 1.5rem;
+            text-align: center;
+        }
+
+        .hero-stat-num {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.5rem;
+            font-weight: 300;
+            color: var(--dark);
+            display: block;
+        }
+
+        .hero-stat-label {
+            font-size: 0.62rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--mid);
+            display: block;
+            margin-top: 0.3rem;
+        }
+
+        /* ---- MEMBER DASHBOARD (logged in) ---- */
+        .dashboard {
+            min-height: 100vh;
+            padding-top: 80px;
+            background-color: var(--bg);
+        }
+
+        .dashboard-header {
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            padding: 3rem 0 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .dashboard-greeting {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            font-weight: 300;
+            color: var(--dark);
+            margin-bottom: 0.3rem;
+        }
+
+            .dashboard-greeting em {
+                font-style: italic;
+                color: var(--gold);
+            }
+
+        .dashboard-meta {
+            font-size: 0.72rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--mid);
+        }
+
+        .quick-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+        }
+
+        .quick-card {
+            background: var(--white);
+            padding: 2rem 1.8rem;
+            text-decoration: none;
+            display: block;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .quick-card::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 2px;
+                background: var(--gold);
+                transform: scaleX(0);
+                transition: transform 0.2s;
+            }
+
+            .quick-card:hover {
+                background-color: var(--cream);
+            }
+
+                .quick-card:hover::after {
+                    transform: scaleX(1);
+                }
+
+        .quick-icon {
+            font-size: 1.6rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .quick-title {
+            font-size: 0.72rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--mid);
+            display: block;
+            transition: color 0.2s;
+            margin-bottom: 0.3rem;
+        }
+
+        .quick-card:hover .quick-title {
+            color: var(--dark);
+        }
+
+        .quick-desc {
+            font-size: 0.78rem;
+            color: #bbb;
+            display: block;
+        }
+
+        .quick-card-admin .quick-title {
+            color: var(--gold);
+        }
+
+        .quick-card-admin:hover .quick-title {
+            color: var(--gold-light);
+        }
+
+        /* ---- BOTTOM INFO STRIP ---- */
+        .info-strip {
+            background: var(--dark);
+            padding: 1.5rem 0;
+            display: flex;
+        }
+
+        .info-strip-inner {
+            display: flex;
+            justify-content: center;
+            gap: 4rem;
+            flex-wrap: wrap;
+        }
+
+        .info-item {
+            text-align: center;
+        }
+
+        .info-item-label {
+            font-size: 0.6rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #555;
+            display: block;
+            margin-bottom: 0.2rem;
+        }
+
+        .info-item-value {
+            font-size: 0.8rem;
+            color: var(--gold);
+            letter-spacing: 1px;
+        }
+
+        /* ---- ANIMATIONS ---- */
+        @@keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @@media (max-width: 992px) {
+            .hero {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-right {
+                display: none;
+            }
+
+            .hero-left {
+                padding: 8rem 2rem 4rem;
+            }
+
+            .home-nav {
+                padding: 1.2rem 2rem;
+            }
+
+            .home-nav-links {
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <!-- ============ LOGGED IN — DASHBOARD ============ -->
+        <nav class="home-nav">
+            <a href="/Home/Index" class="home-brand">Club <em>BAIST</em></a>
+            <ul class="home-nav-links">
+                <li>
+                    <a href="/TeeSheet/ViewSheet?date=@DateTime.Today.ToString("yyyy-MM-dd")">
+                        Tee Sheet
+                    </a>
+                </li>
+                <li><a href="/Score/Enter">Scores</a></li>
+                @if (User.IsInRole("Admin") || User.IsInRole("Clerk"))
+                {
+                    <li><a href="/Application/Review">Admin</a></li>
+                }
+                <li>
+                    <a href="/Account/Logout" class="login-btn"
+                       style="color:#c0392b;border-color:#e8c4c0">
+                        Logout
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="dashboard">
+            <div class="dashboard-header">
+                <div class="container">
+                    <h1 class="dashboard-greeting">
+                        Good @(DateTime.Now.Hour < 12 ? "Morning" :
+                                            DateTime.Now.Hour < 17 ? "Afternoon" : "Evening"),
+                    <em>@User.Identity.Name.Split(' ')[0]</em>
+                </h1>
+                <p class="dashboard-meta">
+                    @DateTime.Today.ToString("dddd, MMMM dd, yyyy") ·
+                    @User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value Member
+                </p>
+            </div>
+        </div>
+
+            <div class="container">
+                <div style="margin-bottom:1rem">
+                    <span style="font-size:0.65rem;letter-spacing:3px;
+                                 text-transform:uppercase;color:var(--gold)">
+                        Quick Access
+                    </span>
+                </div>
+
+                <div class="quick-grid">
+                    <a href="/TeeSheet/ViewSheet?date=@DateTime.Today.ToString("yyyy-MM-dd")"
+                       class="quick-card">
+                        <span class="quick-icon">📅</span>
+                        <span class="quick-title">Tee Sheet</span>
+                        <span class="quick-desc">View today's schedule</span>
+                    </a>
+                    <a href="/Score/Enter" class="quick-card">
+                        <span class="quick-icon">✏️</span>
+                        <span class="quick-title">Enter Score</span>
+                        <span class="quick-desc">Post a new round</span>
+                    </a>
+                    <a href="/Handicap/Index?memberNumber=@User.FindFirst("MemberNumber")?.Value"
+                       class="quick-card">
+                        <span class="quick-icon">📊</span>
+                        <span class="quick-title">Handicap Index</span>
+                        <span class="quick-desc">WHS handicap</span>
+                    </a>
+                    <a href="/Score/History?memberNumber=@User.FindFirst("MemberNumber")?.Value"
+                       class="quick-card">
+                        <span class="quick-icon">📋</span>
+                        <span class="quick-title">Score History</span>
+                        <span class="quick-desc">Last 20 rounds</span>
+                    </a>
+                    <a href="/StandingRequest/Create" class="quick-card">
+                        <span class="quick-icon">📌</span>
+                        <span class="quick-title">Standing Request</span>
+                        <span class="quick-desc">Weekly tee time</span>
+                    </a>
+                    <a href="/Finance/MyAccount?memberNumber=@User.FindFirst("MemberNumber")?.Value"
+                       class="quick-card">
+                        <span class="quick-icon">💳</span>
+                        <span class="quick-title">My Account</span>
+                        <span class="quick-desc">Fees & balance</span>
+                    </a>
+                    <a href="/Member/Profile?memberNumber=@User.FindFirst("MemberNumber")?.Value"
+                       class="quick-card">
+                        <span class="quick-icon">👤</span>
+                        <span class="quick-title">My Profile</span>
+                        <span class="quick-desc">Member details</span>
+                    </a>
+                @if (User.IsInRole("Admin") || User.IsInRole("Clerk"))
+                    {
+                        <a href="/Application/Review" class="quick-card quick-card-admin">
+                            <span class="quick-icon">📝</span>
+                            <span class="quick-title">Applications</span>
+                            <span class="quick-desc">Review & approve</span>
+                        </a>
+                        <a href="/Clerk/CreateTeeSheet" class="quick-card quick-card-admin">
+                            <span class="quick-icon">⚙️</span>
+                            <span class="quick-title">Create Tee Sheet</span>
+                            <span class="quick-desc">Generate slots</span>
+                        </a>
+                        <a href="/Finance/Accounts" class="quick-card quick-card-admin">
+                            <span class="quick-icon">💰</span>
+                            <span class="quick-title">Member Accounts</span>
+                            <span class="quick-desc">Finance overview</span>
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- ============ NOT LOGGED IN — LANDING ============ -->
+        <nav class="home-nav">
+            <a href="/Home/Index" class="home-brand">Club <em>BAIST</em></a>
+            <ul class="home-nav-links">
+                <li><a href="/Application/Apply">Apply</a></li>
+                <li><a href="/Application/Status">Status</a></li>
+                <li><a href="/Account/Login" class="login-btn">Member Login</a></li>
+            </ul>
+        </nav>
+
+        <div class="hero">
+            <!-- Left: Content -->
+            <div class="hero-left">
+                <p class="hero-eyebrow">Est. 1996 — Alberta, Canada</p>
+                <h1 class="hero-title">
+                    Club<br><em>BAIST</em>
+                </h1>
+                <div class="hero-divider"></div>
+                <p class="hero-desc">
+                    An exclusive private golf club featuring an award-winning
+                    18-hole championship course enjoyed by golfers at every
+                    level of play.
+                </p>
+                <div class="hero-cta">
+                    <a href="/Account/Login" class="btn-hero-primary">
+                        Member Login
+                    </a>
+                    <a href="/Application/Apply" class="btn-hero-secondary">
+                        Apply for Membership
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right: Visual -->
+            <div class="hero-right">
+                <div class="hero-number">18</div>
+                <div class="hero-visual">
+                    <div class="hero-stats">
+                        <div class="hero-stat">
+                            <span class="hero-stat-num">18</span>
+                            <span class="hero-stat-label">Holes</span>
+                        </div>
+                        <div class="hero-stat">
+                            <span class="hero-stat-num">4</span>
+                            <span class="hero-stat-label">Tiers</span>
+                        </div>
+                        <div class="hero-stat">
+                            <span class="hero-stat-num">6</span>
+                            <span class="hero-stat-label">Months Season</span>
+                        </div>
+                        <div class="hero-stat">
+                            <span class="hero-stat-num">'96</span>
+                            <span class="hero-stat-label">Founded</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Strip -->
+        <div class="info-strip">
+            <div class="container info-strip-inner">
+                <div class="info-item">
+                    <span class="info-item-label">Golf Season</span>
+                    <span class="info-item-value">April — September</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-item-label">Membership Tiers</span>
+                    <span class="info-item-value">Gold · Silver · Bronze · Copper</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-item-label">Handicap System</span>
+                    <span class="info-item-value">World Handicap System (WHS)</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-item-label">Tee Intervals</span>
+                    <span class="info-item-value">8 Minute Slots</span>
+                </div>
+            </div>
+        </div>
+    }
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

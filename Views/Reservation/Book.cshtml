@@ -1,0 +1,116 @@
+﻿@model ClubBAIST.Models.ViewModels.BookReservationViewModel
+
+@{
+    ViewData["Title"] = "Book Tee Time";
+    var dateStr = Model.SheetDate.ToString("yyyy-MM-dd");
+}
+
+<div class="page-header">
+    <h2>Book Tee Time</h2>
+    <p class="page-subtitle">
+        @Model.SheetDate.ToString("dddd, MMMM dd, yyyy") — @Model.SlotTime
+    </p>
+</div>
+
+@if (Model.ErrorMessage != null)
+{
+    <div class="alert alert-danger mb-3">@Model.ErrorMessage</div>
+}
+
+<form method="post" action="/Reservation/Book">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="SlotId" value="@Model.SlotId" />
+    <input type="hidden" name="SlotTime" value="@Model.SlotTime" />
+    <input type="hidden" name="SheetDate"
+           value="@Model.SheetDate.ToString("yyyy-MM-dd")" />
+
+    <!-- Booking Details -->
+    <div class="panel">
+        <div class="panel-title">Booking Details</div>
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Member Number</label>
+                <input type="text" name="BookedByMemberNumber"
+                       class="form-control" placeholder="e.g. M001"
+                       value="@Model.BookedByMemberNumber" />
+                <div class="form-text">
+                    Member must be in good standing with golf privileges
+                </div>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label class="form-label">Number of Players</label>
+                <select name="NumberOfPlayers" class="form-select">
+                    <option value="1">1 Player</option>
+                    <option value="2" selected>2 Players</option>
+                    <option value="3">3 Players</option>
+                    <option value="4">4 Players</option>
+                </select>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label class="form-label">Number of Carts</label>
+                <select name="NumberOfCarts" class="form-select">
+                    <option value="0">No Carts</option>
+                    <option value="1" selected>1 Cart</option>
+                    <option value="2">2 Carts</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Tee Time Restriction Info -->
+        <div class="alert alert-info" style="font-size:0.8rem;margin-bottom:0">
+            <strong>Tee Time Restrictions:</strong>
+            Gold — Anytime ·
+            Silver — Before 3PM or after 5:30PM weekdays, after 11AM weekends ·
+            Bronze — Before 3PM or after 6PM weekdays, after 1PM weekends
+        </div>
+    </div>
+
+    <!-- Additional Players -->
+    <div class="panel">
+        <div class="panel-title">
+            Additional Players
+            <span style="font-size:0.72rem;color:var(--light-mid);
+                         text-transform:none;letter-spacing:0;font-weight:300">
+                — optional
+            </span>
+        </div>
+        <p style="font-size:0.8rem;color:var(--light-mid);margin-bottom:1.5rem">
+            Enter a member number or guest name for each additional player.
+        </p>
+
+        @for (int i = 2; i <= 4; i++)
+        {
+            <div class="row mb-3 align-items-center">
+                <div class="col-md-1">
+                    <span style="font-family:'Cormorant Garamond',serif;
+                                     font-size:1.2rem;color:var(--light-mid)">
+                        P@(i)
+                    </span>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" name="Player@(i)MemberNumber"
+                           class="form-control" placeholder="Member Number" />
+                </div>
+                <div class="col-md-1 text-center"
+                     style="font-size:0.72rem;color:var(--light-mid)">
+                    or
+                </div>
+                <div class="col-md-3">
+                    <input type="text" name="Player@(i)GuestName"
+                           class="form-control" placeholder="Guest Name" />
+                </div>
+            </div>
+        }
+    </div>
+
+    <div style="display:flex;gap:0.75rem">
+        <button type="submit" class="btn-action btn-action-gold"
+                style="padding:12px 36px">
+            Confirm Booking
+        </button>
+        <a href="/TeeSheet/ViewSheet?date=@dateStr"
+           class="btn-action btn-action-outline" style="padding:12px 36px">
+            Cancel
+        </a>
+    </div>
+</form>

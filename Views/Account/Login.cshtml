@@ -1,0 +1,372 @@
+﻿@model ClubBAIST.Models.ViewModels.LoginViewModel
+
+@{
+    ViewData["Title"] = "Login";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login — Club BAIST</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #B8972E;
+            --gold-pale: #F5EDD6;
+            --dark: #1C1C1C;
+            --mid: #6B6B6B;
+            --border: #E8E3DA;
+            --bg: #FAFAF8;
+            --cream: #F7F4EE;
+            --white: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Jost', sans-serif;
+            font-weight: 300;
+            background-color: var(--bg);
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        /* Left panel */
+        .login-left {
+            background-color: var(--dark);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .login-left::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: radial-gradient(circle at 30% 50%, rgba(184,151,46,0.12) 0%, transparent 60%);
+            }
+
+        .login-left-number {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 22rem;
+            font-weight: 300;
+            color: rgba(184,151,46,0.06);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            user-select: none;
+            line-height: 1;
+        }
+
+        .login-brand-wrap {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .login-brand {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3rem;
+            font-weight: 300;
+            color: var(--white);
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+            .login-brand em {
+                color: var(--gold);
+                font-style: italic;
+            }
+
+        .login-brand-sub {
+            font-size: 0.62rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #555;
+            display: block;
+            margin-bottom: 3rem;
+        }
+
+        .login-left-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1px;
+            background: rgba(255,255,255,0.08);
+            max-width: 280px;
+            width: 100%;
+        }
+
+        .login-left-stat {
+            background: rgba(255,255,255,0.03);
+            padding: 1.2rem;
+            text-align: center;
+        }
+
+        .login-left-stat-num {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            color: var(--gold);
+            display: block;
+        }
+
+        .login-left-stat-label {
+            font-size: 0.58rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #555;
+            display: block;
+            margin-top: 0.2rem;
+        }
+
+        /* Right panel */
+        .login-right {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 3rem;
+            background: var(--white);
+        }
+
+        .login-form-wrap {
+            width: 100%;
+            max-width: 380px;
+        }
+
+        .login-heading {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 300;
+            color: var(--dark);
+            margin-bottom: 0.4rem;
+        }
+
+        .login-subheading {
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--mid);
+            margin-bottom: 2.5rem;
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1.4rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.68rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--mid);
+            margin-bottom: 0.4rem;
+        }
+
+        .form-control {
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            padding: 0.75rem 1rem;
+            font-family: 'Jost', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 300;
+            color: var(--dark);
+            background: var(--white);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+
+            .form-control:focus {
+                border-color: var(--gold);
+                box-shadow: 0 0 0 3px rgba(184,151,46,0.10);
+            }
+
+            .form-control::placeholder {
+                color: #ccc;
+            }
+
+        .remember-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+            .remember-row input {
+                width: 15px;
+                height: 15px;
+                accent-color: var(--gold);
+                cursor: pointer;
+            }
+
+            .remember-row label {
+                font-size: 0.72rem;
+                letter-spacing: 1px;
+                color: var(--mid);
+                cursor: pointer;
+            }
+
+        .btn-login {
+            width: 100%;
+            background-color: var(--dark);
+            color: var(--white);
+            border: none;
+            padding: 14px;
+            font-family: 'Jost', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 500;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.2s;
+        }
+
+            .btn-login:hover {
+                background-color: var(--gold);
+                box-shadow: 0 4px 16px rgba(184,151,46,0.3);
+                transform: translateY(-1px);
+            }
+
+        .login-links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+        }
+
+            .login-links a {
+                font-size: 0.7rem;
+                letter-spacing: 1px;
+                color: var(--mid);
+                text-decoration: none;
+                text-transform: uppercase;
+                transition: color 0.2s;
+            }
+
+                .login-links a:hover {
+                    color: var(--gold);
+                }
+
+        .error-box {
+            background: #FDF5F5;
+            border: 1px solid #F0C8C3;
+            border-left: 3px solid #C0392B;
+            color: #8B2020;
+            padding: 0.8rem 1rem;
+            font-size: 0.82rem;
+            margin-bottom: 1.5rem;
+            border-radius: 1px;
+        }
+
+        @@media (max-width: 768px) {
+            body {
+                grid-template-columns: 1fr;
+            }
+
+            .login-left {
+                display: none;
+            }
+
+            .login-right {
+                padding: 3rem 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Left Panel -->
+    <div class="login-left">
+        <div class="login-left-number">18</div>
+        <div class="login-brand-wrap">
+            <span class="login-brand">Club <em>BAIST</em></span>
+            <span class="login-brand-sub">Private Golf Club — Est. 1996</span>
+            <div class="login-left-stats">
+                <div class="login-left-stat">
+                    <span class="login-left-stat-num">18</span>
+                    <span class="login-left-stat-label">Holes</span>
+                </div>
+                <div class="login-left-stat">
+                    <span class="login-left-stat-num">4</span>
+                    <span class="login-left-stat-label">Tiers</span>
+                </div>
+                <div class="login-left-stat">
+                    <span class="login-left-stat-num">6</span>
+                    <span class="login-left-stat-label">Months</span>
+                </div>
+                <div class="login-left-stat">
+                    <span class="login-left-stat-num">'96</span>
+                    <span class="login-left-stat-label">Founded</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="login-right">
+        <div class="login-form-wrap">
+
+            <h1 class="login-heading">Welcome Back</h1>
+            <span class="login-subheading">Member Portal Login</span>
+
+            @if (Model.ErrorMessage != null)
+            {
+                <div class="error-box">@Model.ErrorMessage</div>
+            }
+
+            <form method="post" action="/Account/Login">
+                @Html.AntiForgeryToken()
+
+                <div class="form-group">
+                    <label class="form-label">Member Number</label>
+                    <input type="text" name="MemberNumber"
+                           class="form-control"
+                           placeholder="e.g. M001"
+                           value="@Model.MemberNumber"
+                           autofocus />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" name="Password"
+                           class="form-control"
+                           placeholder="••••••••" />
+                </div>
+
+                <div class="remember-row">
+                    <input type="checkbox" name="RememberMe"
+                           id="RememberMe" value="true" />
+                    <label for="RememberMe">Remember me</label>
+                </div>
+
+                <button type="submit" class="btn-login">
+                    Sign In
+                </button>
+            </form>
+
+            <div class="login-links">
+                <a href="/Application/Apply">Apply for Membership</a>
+                <a href="/Application/Status">Check Application Status</a>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>

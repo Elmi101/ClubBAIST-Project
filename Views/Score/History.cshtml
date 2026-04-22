@@ -1,0 +1,119 @@
+﻿@model ClubBAIST.Models.ViewModels.ScoreHistoryViewModel
+
+@{
+    ViewData["Title"] = "Score History";
+}
+
+<div class="page-header">
+    <h2>Score History</h2>
+    <p class="page-subtitle">@Model.MemberName</p>
+</div>
+
+<!-- Handicap Summary -->
+<div class="stat-grid" style="grid-template-columns:repeat(3,1fr)">
+    <div class="stat-card">
+        <span class="stat-label">Handicap Index</span>
+        <span class="stat-value stat-value-gold">
+            @Model.HandicapIndex.ToString("F1")
+        </span>
+        <span class="stat-sub">WHS Calculated</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Last 20 Average</span>
+        <span class="stat-value">@Model.Last20Average.ToString("F1")</span>
+        <span class="stat-sub">Score Differential</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Best 8 Average</span>
+        <span class="stat-value">@Model.Best8Average.ToString("F1")</span>
+        <span class="stat-sub">Used for Handicap</span>
+    </div>
+</div>
+
+<!-- Controls -->
+<div style="display:flex;justify-content:space-between;
+            align-items:center;margin-bottom:1rem">
+    <span style="font-size:0.72rem;color:var(--light-mid);letter-spacing:1px">
+        @Model.Rounds.Count round(s) —
+        <span style="color:var(--gold)">★ best 8 highlighted</span>
+    </span>
+    <a href="/Score/Enter"
+       class="btn-action btn-action-dark" style="padding:8px 20px">
+        + Enter New Round
+    </a>
+</div>
+
+@if (!Model.Rounds.Any())
+{
+    <div class="panel" style="text-align:center;padding:3rem">
+        <p style="font-family:'Cormorant Garamond',serif;
+                      font-size:1.4rem;color:var(--mid);margin-bottom:1rem">
+            No rounds on record yet.
+        </p>
+        <a href="/Score/Enter"
+           class="btn-action btn-action-dark" style="padding:10px 24px">
+            Enter Your First Round
+        </a>
+    </div>
+}
+else
+{
+    <div class="panel" style="padding:0">
+        <table class="baist-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Course</th>
+                    <th>Tee</th>
+                    <th>Rating</th>
+                    <th>Slope</th>
+                    <th style="text-align:center">Score</th>
+                    <th style="text-align:center">Differential</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Model.Rounds)
+                {
+                    <tr style="@(r.IsBest8 ? "background:#FDFAF0;" : "")">
+                        <td>@r.PlayedDate.ToString("MMM dd, yyyy")</td>
+                        <td>
+                            <strong style="color:var(--dark)">
+                                @r.CourseName
+                            </strong>
+                        </td>
+                        <td style="color:var(--mid)">@r.TeeName</td>
+                        <td style="color:var(--light-mid)">@r.CourseRating</td>
+                        <td style="color:var(--light-mid)">@r.SlopeRating</td>
+                        <td style="text-align:center">
+                            <strong style="font-family:'Cormorant Garamond',serif;
+                                                   font-size:1.2rem">
+                                @r.TotalScore
+                            </strong>
+                        </td>
+                        <td style="text-align:center">
+                            @if (r.ScoreDifferential.HasValue)
+                            {
+                                <span style="@(r.IsBest8 ?
+                                                                          "color:var(--gold);font-weight:500" :
+                                                                          "color:var(--mid)")">
+                        @r.ScoreDifferential.Value.ToString("F1")
+                        @if (r.IsBest8)
+                                    {
+                                        <span style="color:var(--gold)">★</span>
+                                    }
+                                </span>
+                            }
+                        </td>
+                        <td>
+                            <a href="/Score/Detail?roundId=@r.RoundId"
+                               class="btn-action btn-action-outline">
+                                View
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

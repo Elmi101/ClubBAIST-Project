@@ -1,0 +1,169 @@
+﻿@model ClubBAIST.Models.ViewModels.BookReservationViewModel
+
+@{
+    ViewData["Title"] = "Modify Reservation";
+    var dateStr = Model.SheetDate.ToString("yyyy-MM-dd");
+}
+
+<div class="page-header">
+    <h2>Modify Reservation</h2>
+    <p class="page-subtitle">
+        @Model.SheetDate.ToString("dddd, MMMM dd, yyyy") — @Model.SlotTime
+    </p>
+</div>
+
+@if (Model.ErrorMessage != null)
+{
+    <div class="alert alert-danger mb-3">@Model.ErrorMessage</div>
+}
+
+<form method="post" action="/Reservation/Modify">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="reservationId"
+           value="@ViewBag.ReservationId" />
+
+    <!-- Booking Details -->
+    <div class="panel">
+        <div class="panel-title">Reservation Details</div>
+
+        <div class="alert alert-info mb-4" style="font-size:0.82rem">
+            Booked by <strong>@Model.BookedByMemberNumber</strong>
+            on @Model.SheetDate.ToString("MMMM dd, yyyy")
+            at @Model.SlotTime
+        </div>
+
+        <div class="row">
+            <div class="col-md-2 mb-3">
+                <label class="form-label">Number of Players</label>
+                <select name="numberOfPlayers" class="form-select">
+                    <option value="1"
+                            @(Model.NumberOfPlayers == 1 ? "selected" : "")>
+                        1 Player
+                    </option>
+                    <option value="2"
+                            @(Model.NumberOfPlayers == 2 ? "selected" : "")>
+                        2 Players
+                    </option>
+                    <option value="3"
+                            @(Model.NumberOfPlayers == 3 ? "selected" : "")>
+                        3 Players
+                    </option>
+                    <option value="4"
+                            @(Model.NumberOfPlayers == 4 ? "selected" : "")>
+                        4 Players
+                    </option>
+                </select>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label class="form-label">Number of Carts</label>
+                <select name="numberOfCarts" class="form-select">
+                    <option value="0"
+                            @(Model.NumberOfCarts == 0 ? "selected" : "")>
+                        No Carts
+                    </option>
+                    <option value="1"
+                            @(Model.NumberOfCarts == 1 ? "selected" : "")>
+                        1 Cart
+                    </option>
+                    <option value="2"
+                            @(Model.NumberOfCarts == 2 ? "selected" : "")>
+                        2 Carts
+                    </option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Players -->
+    <div class="panel">
+        <div class="panel-title">
+            Update Players
+            <span style="font-size:0.72rem;color:var(--light-mid);
+                         text-transform:none;letter-spacing:0;
+                         font-weight:300">
+                — Player 1 is the booking member and cannot be changed
+            </span>
+        </div>
+
+        <!-- Player 1 — locked -->
+        <div class="row mb-3 align-items-center">
+            <div class="col-md-1">
+                <span style="font-family:'Cormorant Garamond',serif;
+                             font-size:1.2rem;color:var(--light-mid)">
+                    P1
+                </span>
+            </div>
+            <div class="col-md-3">
+                <input type="text" class="form-control"
+                       value="@Model.BookedByMemberNumber"
+                       disabled
+                       style="background:var(--cream);color:var(--mid)" />
+            </div>
+            <div class="col-md-4">
+                <span style="font-size:0.72rem;color:var(--light-mid)">
+                    Booking member — cannot be changed
+                </span>
+            </div>
+        </div>
+
+        <!-- Players 2-4 -->
+        @{
+            var pNumbers = new[] { 2, 3, 4 };
+            var pMemberNums = new[]
+            {
+                Model.Player2MemberNumber,
+                Model.Player3MemberNumber,
+                Model.Player4MemberNumber
+                };
+            var pGuestNames = new[]
+            {
+                Model.Player2GuestName,
+                Model.Player3GuestName,
+                Model.Player4GuestName
+                };
+        }
+
+        @for (int i = 0; i < 3; i++)
+        {
+            <div class="row mb-3 align-items-center">
+                <div class="col-md-1">
+                    <span style="font-family:'Cormorant Garamond',serif;
+                                     font-size:1.2rem;color:var(--light-mid)">
+                        P@(pNumbers[i])
+                    </span>
+                </div>
+                <div class="col-md-3">
+                    <input type="text"
+                           name="player@(pNumbers[i])MemberNumber"
+                           class="form-control"
+                           placeholder="Member Number"
+                           value="@pMemberNums[i]" />
+                </div>
+                <div class="col-md-1 text-center"
+                     style="font-size:0.72rem;color:var(--light-mid)">
+                    or
+                </div>
+                <div class="col-md-3">
+                    <input type="text"
+                           name="player@(pNumbers[i])GuestName"
+                           class="form-control"
+                           placeholder="Guest Name"
+                           value="@pGuestNames[i]" />
+                </div>
+            </div>
+        }
+    </div>
+
+    <div style="display:flex;gap:0.75rem">
+        <button type="submit"
+                class="btn-action btn-action-gold"
+                style="padding:12px 36px">
+            Save Changes
+        </button>
+        <a href="/TeeSheet/ViewSheet?date=@dateStr"
+           class="btn-action btn-action-outline"
+           style="padding:12px 36px">
+            Cancel
+        </a>
+    </div>
+</form>

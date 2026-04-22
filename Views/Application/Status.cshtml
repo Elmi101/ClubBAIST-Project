@@ -1,0 +1,138 @@
+﻿@model ClubBAIST.Models.ViewModels.ApplicationStatusViewModel
+
+@{
+    ViewData["Title"] = "Application Status";
+}
+
+<div class="page-header">
+    <h2>Application Status</h2>
+    <p class="page-subtitle">
+        Check the status of your membership application
+    </p>
+</div>
+
+<div class="row">
+    <div class="col-md-5">
+        <div class="panel">
+            <div class="panel-title">Look Up Application</div>
+
+            @if (Model.ErrorMessage != null)
+            {
+                <div class="alert alert-danger mb-3">
+                    @Model.ErrorMessage
+                </div>
+            }
+
+            <form method="post" action="/Application/Status">
+                @Html.AntiForgeryToken()
+                <div class="mb-3">
+                    <label class="form-label">Last Name</label>
+                    <input type="text" name="LastName"
+                           class="form-control"
+                           value="@Model.LastName"
+                           placeholder="As entered on application" />
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Phone Number</label>
+                    <input type="text" name="Phone"
+                           class="form-control"
+                           value="@Model.Phone"
+                           placeholder="As entered on application" />
+                </div>
+                <button type="submit"
+                        class="btn-action btn-action-dark"
+                        style="padding:10px 28px">
+                    Check Status
+                </button>
+            </form>
+        </div>
+    </div>
+
+    @if (Model.ApplicantName != null)
+    {
+        <div class="col-md-7">
+            <div class="panel">
+                <div class="panel-title">@Model.ApplicantName</div>
+
+                @{
+                    var pillClass = Model.Status switch
+                    {
+                        "Accepted" => "status-active",
+                        "Denied" => "status-cancelled",
+                        "OnHold" => "status-booked",
+                        "Waitlisted" => "status-blocked",
+                        _ => "status-blocked"
+                    };
+                }
+
+                <table class="baist-table" style="margin-bottom:0">
+                    <tr>
+                        <td style="color:var(--mid);width:160px">
+                            Desired Membership
+                        </td>
+                        <td>@Model.DesiredType</td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--mid)">Submitted</td>
+                        <td>
+                            @Model.SubmittedDate?.ToString("MMMM dd, yyyy")
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--mid)">Status</td>
+                        <td>
+                            <span class="status-pill @pillClass"
+                                  style="font-size:0.75rem;padding:5px 14px">
+                                @Model.Status
+                            </span>
+                        </td>
+                    </tr>
+                    @if (Model.ReviewDate != null)
+                    {
+                        <tr>
+                            <td style="color:var(--mid)">Last Reviewed</td>
+                            <td>
+                                @Model.ReviewDate?.ToString("MMMM dd, yyyy")
+                            </td>
+                        </tr>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.Notes))
+                    {
+                        <tr>
+                            <td style="color:var(--mid)">Notes</td>
+                            <td style="font-style:italic;color:var(--mid)">
+                                @Model.Notes
+                            </td>
+                        </tr>
+                    }
+                </table>
+
+                @if (Model.Status == "Accepted")
+                {
+                    <div class="alert alert-success mt-3 mb-0"
+                         style="font-size:0.82rem">
+                        🎉 Congratulations! Your application has been accepted.
+                        You will be contacted with your member credentials shortly.
+                    </div>
+                }
+                else if (Model.Status == "Denied")
+                {
+                    <div class="alert alert-danger mt-3 mb-0"
+                         style="font-size:0.82rem">
+                        We regret to inform you that your application was not
+                        accepted at this time. Please contact the club for
+                        further information.
+                    </div>
+                }
+                else if (Model.Status == "Waitlisted")
+                {
+                    <div class="alert alert-warning mt-3 mb-0"
+                         style="font-size:0.82rem">
+                        Your application is currently on the waitlist.
+                        We will contact you when a position becomes available.
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>

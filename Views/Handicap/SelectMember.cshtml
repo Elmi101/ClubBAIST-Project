@@ -1,0 +1,28 @@
+﻿@{
+    ViewData["Title"] = "Handicap Lookup";
+}
+
+<div class="page-header">
+    <h2>Handicap Index</h2>
+    <p class="page-subtitle">Look up a member's handicap</p>
+</div>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger mb-3">@ViewBag.Error</div>
+}
+
+<div class="panel" style="max-width:400px">
+    <div class="panel-title">Member Lookup</div>
+    <form method="get" action="/Handicap/Index">
+        <div class="mb-4">
+            <label class="form-label">Member Number</label>
+            <input type="text" name="memberNumber"
+                   class="form-control" placeholder="e.g. M001" />
+        </div>
+        <button type="submit"
+                class="btn-action btn-action-dark" style="padding:10px 28px">
+            View Handicap
+        </button>
+    </form>
+</div>

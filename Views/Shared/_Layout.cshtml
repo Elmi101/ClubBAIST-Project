@@ -1,0 +1,925 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — Club BAIST</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #B8972E;
+            --gold-light: #D4B96A;
+            --gold-pale: #F5EDD6;
+            --dark: #1C1C1C;
+            --charcoal: #2C2C2C;
+            --mid: #6B6B6B;
+            --light-mid: #9A9A9A;
+            --border: #E8E3DA;
+            --bg: #FAFAF8;
+            --white: #FFFFFF;
+            --cream: #F7F4EE;
+            --shadow-sm: 0 1px 4px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 32px rgba(0,0,0,0.10);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Jost', sans-serif;
+            font-weight: 300;
+            background-color: var(--bg);
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ============================================
+                   NAVBAR
+                ============================================ */
+        .site-nav {
+            background-color: var(--white);
+            border-bottom: 1px solid var(--border);
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-sm);
+        }
+
+            .site-nav .container {
+                display: flex;
+                align-items: stretch;
+                height: 62px;
+            }
+
+        .nav-brand {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--dark) !important;
+            text-decoration: none;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            padding-right: 2rem;
+            border-right: 1px solid var(--border);
+            margin-right: 0.5rem;
+            white-space: nowrap;
+        }
+
+            .nav-brand span {
+                color: var(--gold);
+                margin-right: 6px;
+            }
+
+            .nav-brand:hover {
+                color: var(--charcoal) !important;
+            }
+
+        .navbar-nav .nav-link {
+            color: var(--mid) !important;
+            font-size: 0.75rem;
+            font-weight: 400;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 0 1rem !important;
+            height: 62px;
+            display: flex;
+            align-items: center;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+            .navbar-nav .nav-link:hover {
+                color: var(--dark) !important;
+                border-bottom-color: var(--gold);
+            }
+
+        .dropdown-menu {
+            background-color: var(--white);
+            border: 1px solid var(--border);
+            border-top: 2px solid var(--gold);
+            border-radius: 0;
+            padding: 0.5rem 0;
+            min-width: 230px;
+            box-shadow: var(--shadow-lg);
+            margin-top: 0 !important;
+        }
+
+        .dropdown-item {
+            color: var(--mid);
+            font-size: 0.78rem;
+            letter-spacing: 0.5px;
+            padding: 0.65rem 1.4rem;
+            font-family: 'Jost', sans-serif;
+            font-weight: 300;
+            transition: all 0.15s;
+        }
+
+            .dropdown-item:hover {
+                background-color: var(--cream);
+                color: var(--dark);
+            }
+
+        .dropdown-divider {
+            border-color: var(--border);
+            margin: 0.3rem 0;
+        }
+
+        .nav-section-label {
+            font-size: 0.62rem;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--gold);
+            padding: 0.6rem 1.4rem 0.2rem;
+            display: block;
+            font-weight: 500;
+        }
+
+        .admin-link {
+            color: var(--gold) !important;
+        }
+
+            .admin-link:hover {
+                color: var(--gold-light) !important;
+                border-bottom-color: var(--gold) !important;
+            }
+
+        .user-badge {
+            background-color: var(--gold-pale);
+            color: var(--gold);
+            font-size: 0.6rem;
+            padding: 2px 8px;
+            border-radius: 2px;
+            margin-left: 6px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .nav-login-btn {
+            border: 1px solid var(--gold) !important;
+            color: var(--gold) !important;
+            padding: 7px 22px !important;
+            height: auto !important;
+            border-bottom: 1px solid var(--gold) !important;
+            border-radius: 2px;
+            margin: auto 0;
+            font-weight: 400;
+            transition: all 0.2s;
+        }
+
+            .nav-login-btn:hover {
+                background-color: var(--gold) !important;
+                color: var(--white) !important;
+            }
+
+        /* ============================================
+                   MAIN CONTENT
+                ============================================ */
+        .main-content {
+            flex: 1;
+            padding-top: 2.5rem;
+            padding-bottom: 4rem;
+        }
+
+        /* ============================================
+                   PAGE HEADERS
+                ============================================ */
+        .page-header {
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+        }
+
+            .page-header::after {
+                content: '';
+                position: absolute;
+                bottom: -1px;
+                left: 0;
+                width: 48px;
+                height: 2px;
+                background: var(--gold);
+            }
+
+            .page-header h2 {
+                font-family: 'Cormorant Garamond', serif;
+                font-size: 2.4rem;
+                font-weight: 300;
+                color: var(--dark);
+                margin-bottom: 0.3rem;
+                letter-spacing: -0.5px;
+                line-height: 1.1;
+            }
+
+        .page-subtitle {
+            font-size: 0.72rem;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--light-mid);
+            margin: 0;
+        }
+
+        /* ============================================
+                   PANELS
+                ============================================ */
+        .panel {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: box-shadow 0.2s;
+        }
+
+            .panel:hover {
+                box-shadow: var(--shadow-md);
+            }
+
+        .panel-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--dark);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+            .panel-title::before {
+                content: '';
+                display: inline-block;
+                width: 3px;
+                height: 14px;
+                background: var(--gold);
+                border-radius: 2px;
+            }
+
+        /* ============================================
+                   FORMS
+                ============================================ */
+        .form-label {
+            font-size: 0.7rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--mid);
+            font-weight: 400;
+            margin-bottom: 0.4rem;
+            display: block;
+        }
+
+        .form-control, .form-select {
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            font-size: 0.88rem;
+            font-family: 'Jost', sans-serif;
+            font-weight: 300;
+            color: var(--dark);
+            padding: 0.65rem 0.9rem;
+            background-color: var(--white);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+            .form-control:focus, .form-select:focus {
+                border-color: var(--gold);
+                box-shadow: 0 0 0 3px rgba(184,151,46,0.10);
+                outline: none;
+            }
+
+            .form-control::placeholder {
+                color: #c5c0b8;
+            }
+
+        .form-text {
+            font-size: 0.73rem;
+            color: var(--light-mid);
+            margin-top: 0.3rem;
+        }
+
+        /* ============================================
+                   BUTTONS
+                ============================================ */
+        .btn-action {
+            font-size: 0.7rem;
+            font-family: 'Jost', sans-serif;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-weight: 500;
+            padding: 8px 18px;
+            border-radius: 2px;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.18s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-action-dark {
+            background-color: var(--dark);
+            color: var(--white);
+            border: 1px solid var(--dark);
+        }
+
+            .btn-action-dark:hover {
+                background-color: var(--charcoal);
+                color: var(--white);
+                box-shadow: var(--shadow-md);
+                transform: translateY(-1px);
+            }
+
+        .btn-action-gold {
+            background-color: var(--gold);
+            color: var(--white);
+            border: 1px solid var(--gold);
+        }
+
+            .btn-action-gold:hover {
+                background-color: var(--gold-light);
+                color: var(--white);
+                box-shadow: 0 4px 12px rgba(184,151,46,0.3);
+                transform: translateY(-1px);
+            }
+
+        .btn-action-outline {
+            background-color: transparent;
+            color: var(--mid);
+            border: 1px solid var(--border);
+        }
+
+            .btn-action-outline:hover {
+                border-color: var(--dark);
+                color: var(--dark);
+                background-color: var(--cream);
+            }
+
+        .btn-action-danger {
+            background-color: transparent;
+            color: #c0392b;
+            border: 1px solid #e8c4c0;
+        }
+
+            .btn-action-danger:hover {
+                background-color: #c0392b;
+                color: var(--white);
+                border-color: #c0392b;
+            }
+
+        /* ============================================
+                   TABLES
+                ============================================ */
+        .baist-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+            .baist-table th {
+                font-size: 0.67rem;
+                letter-spacing: 2px;
+                text-transform: uppercase;
+                color: var(--light-mid);
+                font-weight: 500;
+                padding: 0.9rem 1.1rem;
+                border-bottom: 1px solid var(--border);
+                background-color: var(--cream);
+                text-align: left;
+            }
+
+            .baist-table td {
+                padding: 0.9rem 1.1rem;
+                border-bottom: 1px solid #F0EDE6;
+                color: var(--charcoal);
+                vertical-align: middle;
+            }
+
+            .baist-table tr:last-child td {
+                border-bottom: none;
+            }
+
+            .baist-table tbody tr {
+                transition: background-color 0.15s;
+            }
+
+                .baist-table tbody tr:hover td {
+                    background-color: var(--cream);
+                }
+
+        /* ============================================
+                   STATUS PILLS
+                ============================================ */
+        .status-pill {
+            display: inline-block;
+            font-size: 0.62rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .status-available {
+            background: #EAF5EA;
+            color: #2A6A2A;
+        }
+
+        .status-booked {
+            background: #FDF6E3;
+            color: #8A6800;
+        }
+
+        .status-blocked {
+            background: #F3F3F3;
+            color: #888;
+        }
+
+        .status-cancelled {
+            background: #FDF0EE;
+            color: #C0392B;
+        }
+
+        .status-active {
+            background: #EAF5EA;
+            color: #2A6A2A;
+        }
+
+        /* ============================================
+                   BADGES
+                ============================================ */
+        .badge {
+            font-weight: 500;
+            letter-spacing: 1px;
+            font-size: 0.62rem;
+            text-transform: uppercase;
+            border-radius: 2px;
+            padding: 3px 8px;
+        }
+
+        .badge-gold {
+            background-color: var(--gold-pale);
+            color: var(--gold);
+            border: 1px solid #E8D5A0;
+        }
+
+        /* ============================================
+                   ALERTS
+                ============================================ */
+        .alert {
+            border-radius: 2px;
+            font-size: 0.84rem;
+            border: 1px solid transparent;
+            border-left: 3px solid;
+            padding: 0.9rem 1.2rem;
+            font-family: 'Jost', sans-serif;
+            font-weight: 300;
+        }
+
+        .alert-success {
+            background-color: #F0F9F0;
+            border-color: #C3E6C3;
+            border-left-color: #2A6A2A;
+            color: #1E4D1E;
+        }
+
+        .alert-danger {
+            background-color: #FDF5F5;
+            border-color: #F0C8C3;
+            border-left-color: #C0392B;
+            color: #8B2020;
+        }
+
+        .alert-warning {
+            background-color: #FDFAF0;
+            border-color: #F0E4B0;
+            border-left-color: var(--gold);
+            color: #6B5500;
+        }
+
+        .alert-info {
+            background-color: #F0F6FD;
+            border-color: #C3D8F0;
+            border-left-color: #1A5276;
+            color: #1A3A5C;
+        }
+
+        /* ============================================
+                   DATE NAV
+                ============================================ */
+        .date-nav {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .date-nav-btn {
+            background: var(--white);
+            border: 1px solid var(--border);
+            color: var(--mid);
+            padding: 7px 18px;
+            font-size: 0.72rem;
+            font-family: 'Jost', sans-serif;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: all 0.15s;
+            border-radius: 2px;
+            font-weight: 400;
+        }
+
+            .date-nav-btn:hover {
+                border-color: var(--gold);
+                color: var(--dark);
+                background-color: var(--gold-pale);
+            }
+
+            .date-nav-btn.active {
+                background-color: var(--dark);
+                color: var(--white);
+                border-color: var(--dark);
+            }
+
+        /* ============================================
+                   SECTION DIVIDER
+                ============================================ */
+        .section-divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 2rem 0 1.5rem;
+        }
+
+        .section-divider-label {
+            font-size: 0.65rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--gold);
+            white-space: nowrap;
+            font-weight: 500;
+        }
+
+        .section-divider-line {
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* ============================================
+                   STAT CARDS
+                ============================================ */
+        .stat-grid {
+            display: grid;
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 1.5rem 2rem;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.62rem;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--light-mid);
+            margin-bottom: 0.4rem;
+            display: block;
+        }
+
+        .stat-value {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.2rem;
+            font-weight: 300;
+            color: var(--dark);
+            line-height: 1;
+            display: block;
+        }
+
+        .stat-sub {
+            font-size: 0.72rem;
+            color: var(--light-mid);
+            margin-top: 0.3rem;
+            display: block;
+        }
+
+        .stat-value-gold {
+            color: var(--gold);
+        }
+
+        .stat-value-green {
+            color: #2A6A2A;
+        }
+
+        .stat-value-red {
+            color: #C0392B;
+        }
+
+        /* ============================================
+                   FOOTER
+                ============================================ */
+        .site-footer {
+            background-color: var(--dark);
+            color: #666;
+            padding: 24px 0;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-align: center;
+            border-top: 1px solid #333;
+            margin-top: auto;
+        }
+
+            .site-footer span {
+                color: var(--gold);
+            }
+
+        /* ============================================
+                   SCROLLBAR
+                ============================================ */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: var(--gold-light);
+            }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="site-nav">
+        <div class="container">
+            <a class="nav-brand" href="/Home/Index">
+                <span>⛳</span> Club BAIST
+            </a>
+
+            <button class="navbar-toggler d-lg-none border-0 ms-auto bg-transparent"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#mainNav"
+                    style="color:var(--mid);font-size:1.2rem">
+                ☰
+            </button>
+
+            <div class="collapse navbar-collapse" id="mainNav">
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <ul class="navbar-nav me-auto">
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#"
+                               data-bs-toggle="dropdown">Tee Times</a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item"
+                                       href="/TeeSheet/ViewSheet?date=@DateTime.Today.ToString("yyyy-MM-dd")">
+                                        Today's Tee Sheet
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       href="/StandingRequest/Create">
+                                        Make Standing Request
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       href="/StandingRequest/MyRequests?memberNumber=@User.FindFirst("MemberNumber")?.Value">
+                                        My Standing Requests
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#"
+                               data-bs-toggle="dropdown">Scores</a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="/Score/Enter">
+                                        Enter a Score
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       href="/Score/History?memberNumber=@User.FindFirst("MemberNumber")?.Value">
+                                        My Score History
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       href="/Handicap/Index?memberNumber=@User.FindFirst("MemberNumber")?.Value">
+                                        My Handicap Index
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#"
+                               data-bs-toggle="dropdown">Membership</a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="/Application/Apply">
+                                        Apply for Membership
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/Application/Status">
+                                        Check Application Status
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        @if (User.IsInRole("Admin") || User.IsInRole("Clerk"))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle admin-link"
+                                   href="#" data-bs-toggle="dropdown">
+                                    Admin
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <span class="nav-section-label">
+                                            Tee Sheet
+                                        </span>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item"
+                                           href="/Clerk/CreateTeeSheet">
+                                            Create Tee Sheet
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item"
+                                           href="/Clerk/ManageStandingRequests">
+                                            Manage Standing Requests
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li>
+                                        <span class="nav-section-label">
+                                            Membership
+                                        </span>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item"
+                                           href="/Application/Review">
+                                            Review Applications
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item"
+                                           href="/Clerk/Members">
+                                            All Members
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li>
+                                        <span class="nav-section-label">
+                                            Finance
+                                        </span>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item"
+                                           href="/Finance/Accounts">
+                                            Member Accounts
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+
+                    </ul>
+
+                    <ul class="navbar-nav ms-auto align-items-center">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#"
+                               data-bs-toggle="dropdown">
+                                @User.Identity.Name
+                                <span class="user-badge">
+                                    @User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value
+                                </span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item"
+                                       href="/Member/Profile?memberNumber=@User.FindFirst("MemberNumber")?.Value">
+                                        My Profile
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       href="/Finance/MyAccount?memberNumber=@User.FindFirst("MemberNumber")?.Value">
+                                        My Account
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       style="color:#C0392B"
+                                       href="/Account/Logout">
+                                        Logout
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                }
+                else
+                {
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Application/Apply">
+                                Apply for Membership
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Application/Status">
+                                Application Status
+                            </a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav ms-auto align-items-center">
+                        <li class="nav-item">
+                            <a class="nav-link nav-login-btn"
+                               href="/Account/Login">
+                                Login
+                            </a>
+                        </li>
+                    </ul>
+                }
+            </div>
+        </div>
+    </nav>
+
+    <!-- GLOBAL ALERTS -->
+    <div class="container">
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show mt-3">
+                @TempData["Success"]
+                <button type="button" class="btn-close"
+                        data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show mt-3">
+                @TempData["Error"]
+                <button type="button" class="btn-close"
+                        data-bs-dismiss="alert"></button>
+            </div>
+        }
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="container main-content">
+        @RenderBody()
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+        <div class="container">
+            <span>Club BAIST</span> —
+            Private Golf Club — Est. 1996 — Alberta, Canada
+        </div>
+    </footer>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>

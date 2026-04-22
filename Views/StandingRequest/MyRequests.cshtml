@@ -1,0 +1,128 @@
+﻿@model List<ClubBAIST.Models.Domain.StandingTeeTimeRequest>
+
+@{
+    ViewData["Title"] = "My Standing Requests";
+    string[] days = {
+        "Sunday","Monday","Tuesday","Wednesday",
+        "Thursday","Friday","Saturday"
+    };
+}
+
+<div class="page-header">
+    <h2>Standing Requests</h2>
+    <p class="page-subtitle">@ViewBag.MemberName</p>
+</div>
+
+<div style="margin-bottom:1.5rem">
+    <a href="/StandingRequest/Create"
+       class="btn-action btn-action-dark" style="padding:10px 24px">
+        + New Request
+    </a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="panel" style="text-align:center;padding:3rem">
+        <p style="font-family:'Cormorant Garamond',serif;
+                      font-size:1.4rem;color:var(--mid);margin-bottom:1rem">
+            No standing requests on file.
+        </p>
+        <a href="/StandingRequest/Create"
+           class="btn-action btn-action-dark" style="padding:10px 24px">
+            Submit Your First Request
+        </a>
+    </div>
+}
+else
+{
+    <div class="panel" style="padding:0">
+        <table class="baist-table">
+            <thead>
+                <tr>
+                    <th>Day</th>
+                    <th>Requested Time</th>
+                    <th>Period</th>
+                    <th>Priority</th>
+                    <th>Approved Time</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Model)
+                {
+                    <tr>
+                        <td>
+                            <strong>@days[r.RequestedDayOfWeek]</strong>
+                        </td>
+                        <td>
+                            @DateTime.Today.Add(r.RequestedTime)
+                            .ToString("h:mm tt")
+                        </td>
+                        <td style="color:var(--mid);font-size:0.82rem">
+                            @r.RequestedStartDate.ToString("MMM dd, yyyy")
+                            —
+                            @(r.RequestedEndDate?.ToString("MMM dd, yyyy")
+                                                ?? "Ongoing")
+                </td>
+                <td>
+                    @if (r.PriorityNumber.HasValue)
+                            {
+                                <span class="badge badge-gold">
+                                    #@r.PriorityNumber
+                                </span>
+                            }
+                            else
+                            {
+                                <span style="color:var(--light-mid);
+                                                         font-size:0.8rem">
+                                    Pending
+                                </span>
+                            }
+                        </td>
+                        <td>
+                            @if (r.ApprovedTime.HasValue)
+                            {
+                                <span style="color:var(--gold);font-weight:500">
+                                    @DateTime.Today.Add(r.ApprovedTime.Value)
+                                    .ToString("h:mm tt")
+                                </span>
+                            }
+                            else
+                            {
+                                <span style="color:var(--light-mid)">—</span>
+                            }
+                        </td>
+                        <td>
+                            <span class="status-pill
+                                        @(r.IsActive ? "status-active" : "status-cancelled")">
+                                @(r.IsActive ? "Active" : "Cancelled")
+                            </span>
+                        </td>
+                        <td>
+                            @if (r.IsActive)
+                            {
+                                <form method="post"
+                                      action="/StandingRequest/Cancel"
+                                      style="display:inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden"
+                                           name="standingRequestId"
+                                           value="@r.StandingRequestId" />
+                                    <input type="hidden"
+                                           name="memberNumber"
+                                           value="@ViewBag.MemberNumber" />
+                                    <button type="submit"
+                                            class="btn-action btn-action-danger"
+                                            onclick="return confirm('Cancel this standing request?')">
+                                        Cancel
+                                    </button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

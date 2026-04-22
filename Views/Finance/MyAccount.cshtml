@@ -1,0 +1,201 @@
+﻿@model ClubBAIST.Models.Domain.Member
+
+@{
+    ViewData["Title"] = "Member Account";
+    var account = Model.Account;
+    var transactions = account?.Transactions
+        .OrderByDescending(t => t.TransactionDate).ToList()
+        ?? new List<ClubBAIST.Models.Domain.AccountTransaction>();
+}
+
+<div class="page-header">
+    <h2>Member Account</h2>
+    <p class="page-subtitle">@Model.FullName — @Model.MemberNumber</p>
+</div>
+
+<!-- Account Summary -->
+<div class="stat-grid"
+     style="grid-template-columns:repeat(4,1fr);margin-bottom:2rem">
+    <div class="stat-card">
+        <span class="stat-label">Membership</span>
+        <span style="font-family:'Cormorant Garamond',serif;
+                     font-size:1.2rem;color:var(--dark);
+                     display:block;margin-top:0.3rem">
+            @Model.MembershipType?.Category?.CategoryName
+        </span>
+        <span class="stat-sub">@Model.MembershipType?.TypeName</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Annual Fee</span>
+        <span class="stat-value">
+            $@Model.MembershipType?.AnnualFee.ToString("N0")
+        </span>
+        <span class="stat-sub">Due April 1</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Current Balance</span>
+        <span class="stat-value
+            @(account?.Balance > 0 ? "stat-value-red" : "stat-value-green")">
+            $@account?.Balance.ToString("N2")
+        </span>
+        <span class="stat-sub">
+            @(account?.Balance > 0 ? "Amount owing" : "Paid in full")
+        </span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Member Since</span>
+        <span class="stat-value" style="font-size:1.4rem">
+            @Model.MemberSince.ToString("yyyy")
+        </span>
+        <span class="stat-sub">@Model.YearsAsMember year(s)</span>
+    </div>
+</div>
+
+<!-- Fee Info -->
+<div class="alert alert-info mb-3" style="font-size:0.82rem">
+    <strong>Fee Schedule:</strong>
+    Share Purchase $1,000 (one-time) ·
+    Entrance Fee $10,000 in 4 × $2,500 installments ·
+    Annual fee due April 1 · 10% penalty on overdue balances
+    @if (Model.MembershipType?.Category?.CategoryName == "Gold")
+    {
+        <span>· Minimum $500/yr food & beverage charge applies</span>
+    }
+</div>
+
+<!-- Post Transaction (Admin/Clerk only) -->
+@if (User.IsInRole("Admin") || User.IsInRole("Clerk"))
+{
+    <div class="panel" style="margin-bottom:2rem">
+        <div class="panel-title">Post Transaction</div>
+        <form method="post" action="/Finance/AddTransaction">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="memberNumber"
+                   value="@ViewBag.MemberNumber" />
+            <div class="row align-items-end">
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Transaction Type</label>
+                    <select name="transactionType" class="form-select">
+                        <option value="AnnualFee">Annual Fee</option>
+                        <option value="EntranceFeePayment">
+                            Entrance Fee Payment
+                        </option>
+                        <option value="SharePurchase">Share Purchase</option>
+                        <option value="Penalty">Late Penalty</option>
+                        <option value="FoodBevCharge">
+                            Food & Beverage Charge
+                        </option>
+                        <option value="Payment">Payment Received</option>
+                        <option value="Adjustment">Adjustment</option>
+                    </select>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">Amount ($)</label>
+                    <input type="number" name="amount"
+                           step="0.01" min="0"
+                           class="form-control" placeholder="0.00" />
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Description</label>
+                    <input type="text" name="description"
+                           class="form-control"
+                           placeholder="Optional note" />
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">Posted By (Member #)</label>
+                    <input type="text" name="postedByMemberNumber"
+                           class="form-control" placeholder="e.g. M001" />
+                </div>
+                <div class="col-md-2 mb-3">
+                    <button type="submit"
+                            class="btn-action btn-action-gold w-100"
+                            style="padding:10px">
+                        Post
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+}
+
+<!-- Transaction History -->
+<div class="panel" style="padding:0">
+    <div style="padding:1.2rem 2rem;border-bottom:1px solid var(--border);
+                display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:0.72rem;letter-spacing:2px;
+                     text-transform:uppercase;color:var(--mid)">
+            Transaction History
+        </span>
+        <span style="font-size:0.75rem;color:var(--light-mid)">
+            @transactions.Count transaction(s)
+        </span>
+    </div>
+
+    @if (!transactions.Any())
+    {
+        <div style="padding:3rem;text-align:center;
+                    color:var(--light-mid);font-size:0.88rem">
+            No transactions on record.
+        </div>
+    }
+    else
+    {
+        var running = 0m;
+        var ordered = transactions
+        .OrderBy(t => t.TransactionDate).ToList();
+        var balances = new Dictionary<int, decimal>();
+        foreach (var tx in ordered)
+        {
+            running += tx.TransactionType == "Payment"
+            ? -tx.Amount : tx.Amount;
+            balances[tx.TransactionId] = running;
+        }
+
+        <table class="baist-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th style="text-align:right">Amount</th>
+                    <th style="text-align:right">Balance</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var t in transactions)
+                {
+                    var isPayment = t.TransactionType == "Payment";
+                    var isPenalty = t.TransactionType == "Penalty";
+                    var amtColor  = isPayment ? "var(--gold)" :
+                                    isPenalty ? "#C0392B" : "var(--dark)";
+                    var pillClass = isPayment ? "status-active" :
+                                    isPenalty ? "status-cancelled" :
+                                    "status-booked";
+                    <tr>
+                        <td style="color:var(--light-mid)">
+                            @t.TransactionDate.ToString("MMM dd, yyyy")
+                        </td>
+                        <td>
+                            <span class="status-pill @pillClass">
+                                @t.TransactionType
+                            </span>
+                        </td>
+                        <td style="color:var(--mid);font-size:0.82rem">
+                            @t.Description
+                        </td>
+                        <td style="text-align:right;
+                                   font-family:'Cormorant Garamond',serif;
+                                   font-size:1.05rem;color:@amtColor">
+                            @(isPayment ? "−" : "+")$@t.Amount.ToString("N2")
+                        </td>
+                        <td style="text-align:right;
+                                   color:var(--light-mid);font-size:0.85rem">
+                            $@balances.GetValueOrDefault(
+                                t.TransactionId, 0).ToString("N2")
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

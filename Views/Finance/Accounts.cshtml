@@ -1,0 +1,115 @@
+﻿@model List<ClubBAIST.Models.Domain.Member>
+
+@{
+    ViewData["Title"] = "All Member Accounts";
+    var totalOwing = Model
+        .Where(m => m.Account != null && m.Account.Balance > 0)
+        .Sum(m => m.Account!.Balance);
+    var paidCount = Model
+        .Count(m => m.Account == null || m.Account.Balance <= 0);
+}
+
+<div class="page-header">
+    <h2>Member Accounts</h2>
+    <p class="page-subtitle">Finance Committee Overview</p>
+</div>
+
+<!-- Summary Stats -->
+<div class="stat-grid"
+     style="grid-template-columns:repeat(3,1fr);margin-bottom:2rem">
+    <div class="stat-card">
+        <span class="stat-label">Active Members</span>
+        <span class="stat-value">@Model.Count</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Total Outstanding</span>
+        <span class="stat-value
+            @(totalOwing > 0 ? "stat-value-red" : "stat-value-green")">
+            $@totalOwing.ToString("N0")
+        </span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Paid in Full</span>
+        <span class="stat-value stat-value-green">@paidCount</span>
+    </div>
+</div>
+
+<!-- Assess Fees Button -->
+<div style="display:flex;justify-content:space-between;
+            align-items:center;margin-bottom:1rem">
+    <span style="font-size:0.75rem;color:var(--light-mid)">
+        Annual fees are due April 1 — 10% penalty applies after that date
+    </span>
+    <form method="post" action="/Finance/AssessAnnualFees"
+          style="display:inline">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="postedByMemberNumber" value="M001" />
+        <button type="submit"
+                class="btn-action btn-action-gold"
+                style="padding:10px 24px"
+                onclick="return confirm('Assess annual fees for all active members?')">
+            Assess Annual Fees
+        </button>
+    </form>
+</div>
+
+<div class="panel" style="padding:0">
+    <table class="baist-table">
+        <thead>
+            <tr>
+                <th>Member #</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Type</th>
+                <th>Annual Fee</th>
+                <th style="text-align:right">Balance</th>
+                <th>Standing</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var m in Model)
+            {
+                <tr>
+                    <td style="color:var(--light-mid)">
+                        @m.MemberNumber
+                    </td>
+                    <td>
+                        <strong>@m.FullName</strong>
+                    </td>
+                    <td>
+                        <span class="badge badge-gold">
+                            @m.MembershipType?.Category?.CategoryName
+                        </span>
+                    </td>
+                    <td style="color:var(--mid)">
+                        @m.MembershipType?.TypeName
+                    </td>
+                    <td style="color:var(--mid)">
+                        $@m.MembershipType?.AnnualFee.ToString("N0")
+                    </td>
+                    <td style="text-align:right;
+                                   font-family:'Cormorant Garamond',serif;
+                                   font-size:1.05rem;
+                                   color:@(m.Account?.Balance > 0
+                                                           ? "#C0392B" : "#2A6A2A")">
+                                                                                   $@m.Account?.Balance.ToString("N2")
+                                                                               </td>
+                                                                               <td>
+                                                                                   <span class="status-pill
+                                @(m.IsGoodStanding
+                                                              ? "status-active" : "status-cancelled")">
+                        @(m.IsGoodStanding ? "Good" : "Not Good")
+                    </span>
+                </td>
+                <td>
+                    <a href="/Finance/MyAccount?memberNumber=@m.MemberNumber"
+                       class="btn-action btn-action-outline">
+                        View
+                    </a>
+                </td>
+            </tr>
+                        }
+        </tbody>
+    </table>
+</div>

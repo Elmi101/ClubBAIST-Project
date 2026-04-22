@@ -1,0 +1,76 @@
+﻿@model ClubBAIST.Models.Domain.TeeTimeReservation
+
+@{
+    ViewData["Title"] = "Check In Players";
+    var dateStr = Model.Slot.TeeSheet?.SheetDate.ToString("yyyy-MM-dd")
+                  ?? DateTime.Today.ToString("yyyy-MM-dd");
+}
+
+<div class="page-header">
+    <h2>Check In Players</h2>
+    <p class="page-subtitle">
+        @DateTime.Today.Add(Model.Slot.SlotTime).ToString("h:mm tt") —
+        @Model.Slot.TeeSheet?.SheetDate.ToString("dddd, MMMM dd, yyyy")
+    </p>
+</div>
+
+<div class="panel" style="max-width:520px">
+    <div class="panel-title">Player Check-In</div>
+
+    <form method="post" action="/Reservation/CheckInConfirmed">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="reservationId" value="@Model.ReservationId" />
+
+        <table class="baist-table" style="margin-bottom:2rem">
+            <thead>
+                <tr>
+                    <th>Player</th>
+                    <th style="width:100px;text-align:center">Present</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var player in Model.Players)
+                {
+                    <tr>
+                        <td>
+                            <strong>
+                                @(player.Member?.FullName
+                                                            ?? player.GuestName
+                                                            ?? "Guest")
+                        </strong>
+                        @if (player.Member == null)
+                            {
+                                <span style="font-size:0.72rem;
+                                                     color:var(--light-mid);
+                                                     margin-left:6px">
+                                    (Guest)
+                                </span>
+                            }
+                        </td>
+                        <td style="text-align:center">
+                            <input type="checkbox"
+                                   name="checkedInPlayerIds"
+                                   value="@player.ReservationPlayerId"
+                                   @(player.HasCheckedIn ? "checked" : "")
+                                   style="width:18px;height:18px;
+                                              accent-color:var(--gold);
+                                              cursor:pointer" />
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div style="display:flex;gap:0.75rem">
+            <button type="submit" class="btn-action btn-action-gold"
+                    style="padding:10px 28px">
+                Save Check-In
+            </button>
+            <a href="/TeeSheet/ViewSheet?date=@dateStr"
+               class="btn-action btn-action-outline"
+               style="padding:10px 28px">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>

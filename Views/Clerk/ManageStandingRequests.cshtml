@@ -1,0 +1,135 @@
+﻿@model List<ClubBAIST.Models.Domain.StandingTeeTimeRequest>
+
+@{
+    ViewData["Title"] = "Manage Standing Requests";
+    string[] days = {
+        "Sunday","Monday","Tuesday","Wednesday",
+        "Thursday","Friday","Saturday"
+    };
+}
+
+<div class="page-header">
+    <h2>Standing Tee Time Requests</h2>
+    <p class="page-subtitle">
+        Assign priority numbers and approved tee times
+    </p>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="panel" style="text-align:center;padding:3rem">
+        <p style="font-family:'Cormorant Garamond',serif;
+                  font-size:1.4rem;color:var(--mid)">
+            No active standing tee time requests.
+        </p>
+    </div>
+}
+else
+{
+    @foreach (var r in Model)
+    {
+        <div class="panel" style="margin-bottom:1.5rem">
+            <div style="display:flex;justify-content:space-between;
+                        align-items:flex-start;flex-wrap:wrap;gap:1.5rem">
+
+                <!-- Request Info -->
+                <div style="flex:1;min-width:280px">
+                    <div style="display:flex;align-items:center;
+                                gap:0.75rem;margin-bottom:0.5rem">
+                        <strong style="font-size:1rem">
+                            @r.ShareholderMember?.FullName
+                        </strong>
+                        @if (r.PriorityNumber.HasValue)
+                        {
+                            <span class="badge badge-gold">
+                                Priority #@r.PriorityNumber
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="status-pill status-blocked">
+                                Awaiting Priority
+                            </span>
+                        }
+                    </div>
+
+                    <div style="font-size:0.82rem;color:var(--mid);
+                                margin-bottom:0.5rem">
+                        <strong>@days[r.RequestedDayOfWeek]</strong> ·
+                        @DateTime.Today.Add(r.RequestedTime)
+                                 .ToString("h:mm tt")
+                        <span style="color:var(--light-mid)">(±30 min)</span>
+                    </div>
+
+                    <div style="font-size:0.78rem;color:var(--light-mid);
+                                margin-bottom:0.5rem">
+                        @r.RequestedStartDate.ToString("MMM dd, yyyy") —
+                        @(r.RequestedEndDate?.ToString("MMM dd, yyyy")
+                          ?? "Ongoing")
+                    </div>
+
+                    <div style="font-size:0.78rem;color:var(--mid)">
+                        <span style="color:var(--light-mid)">Foursome:</span>
+                        @r.ShareholderMember?.FullName
+                        @(r.Member2 != null
+                            ? $" · {r.Member2.FullName}" : "")
+                        @(r.Member3 != null
+                            ? $" · {r.Member3.FullName}" : "")
+                        @(r.Member4 != null
+                            ? $" · {r.Member4.FullName}" : "")
+                    </div>
+
+                    @if (r.ApprovedTime.HasValue)
+                    {
+                        <div style="font-size:0.8rem;color:var(--gold);
+                                    margin-top:0.5rem;font-weight:500">
+                            ✓ Approved:
+                            @DateTime.Today.Add(r.ApprovedTime.Value)
+                                     .ToString("h:mm tt")
+                            on @days[r.RequestedDayOfWeek]
+                        </div>
+                    }
+                </div>
+
+                <!-- Approve Form -->
+                <form method="post"
+                      action="/Clerk/ApproveStandingRequest"
+                      style="display:flex;gap:0.75rem;
+                             align-items:flex-end;flex-wrap:wrap">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="standingRequestId"
+                           value="@r.StandingRequestId" />
+
+                    <div>
+                        <label class="form-label">Priority #</label>
+                        <input type="number" name="priorityNumber"
+                               class="form-control"
+                               style="width:85px"
+                               value="@r.PriorityNumber"
+                               min="1" placeholder="1" />
+                    </div>
+                    <div>
+                        <label class="form-label">Approved Time</label>
+                        <input type="time" name="approvedTime"
+                               class="form-control"
+                               style="width:135px"
+                               value="@(r.ApprovedTime.HasValue? r.ApprovedTime.Value.Hours.ToString("D2") + ":" + r.ApprovedTime.Value.Minutes.ToString("D2") : "")" />
+                    </div>
+                    <div>
+                        <label class="form-label">Clerk Member #</label>
+                        <input type="text" name="clerkMemberNumber"
+                               class="form-control"
+                               style="width:110px"
+                               placeholder="e.g. M001" />
+                    </div>
+                    <button type="submit"
+                            class="btn-action btn-action-gold"
+                            style="padding:10px 20px">
+                        Approve
+                    </button>
+                </form>
+
+            </div>
+        </div>
+    }
+}

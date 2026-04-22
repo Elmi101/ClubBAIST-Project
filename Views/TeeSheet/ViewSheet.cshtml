@@ -1,0 +1,123 @@
+﻿@model ClubBAIST.Models.ViewModels.TeeSheetViewModel
+
+@{
+    ViewData["Title"] = "Tee Sheet";
+    var prevDate = Model.SheetDate.AddDays(-1).ToString("yyyy-MM-dd");
+    var nextDate = Model.SheetDate.AddDays(1).ToString("yyyy-MM-dd");
+    var todayDate = DateTime.Today.ToString("yyyy-MM-dd");
+}
+
+<div class="page-header">
+    <h2>Tee Sheet</h2>
+    <p class="page-subtitle">@Model.SheetDate.ToString("dddd, MMMM dd, yyyy")</p>
+</div>
+
+@if (Model.IsLocked)
+{
+    <div class="alert alert-warning mb-3">
+        ⚠️ This tee sheet is locked — no further bookings can be made.
+    </div>
+}
+
+<!-- Date Navigation -->
+<div class="date-nav">
+    <a href="/TeeSheet/ViewSheet?date=@prevDate" class="date-nav-btn">← Previous</a>
+    <a href="/TeeSheet/ViewSheet?date=@todayDate" class="date-nav-btn active">Today</a>
+    <a href="/TeeSheet/ViewSheet?date=@nextDate" class="date-nav-btn">Next →</a>
+    <span style="font-size:0.72rem;color:var(--light-mid);margin-left:0.5rem">
+        @Model.Slots.Count(s => s.IsBooked) booked ·
+        @Model.Slots.Count(s => !s.IsBooked && !s.IsBlocked) available
+    </span>
+</div>
+
+<!-- Tee Sheet Table -->
+<div class="panel" style="padding:0">
+    <table class="baist-table">
+        <thead>
+            <tr>
+                <th style="width:100px">Time</th>
+                <th>Booked By</th>
+                <th style="width:80px">Players</th>
+                <th style="width:70px">Carts</th>
+                <th>Foursome</th>
+                <th style="width:100px">Status</th>
+                <th style="width:220px">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var slot in Model.Slots)
+            {
+                <tr>
+                    <td>
+                        <strong style="font-family:'Cormorant Garamond',serif;
+                                           font-size:1.05rem;color:var(--dark)">
+                            @slot.SlotTime
+                        </strong>
+                    </td>
+
+                    @if (slot.IsBlocked)
+                    {
+                        <td colspan="4"
+                            style="color:var(--light-mid);font-style:italic;
+                                           font-size:0.82rem">
+                            @(slot.BlockReason ?? "Special Event")
+                        </td>
+                        <td>
+                            <span class="status-pill status-blocked">Blocked</span>
+                        </td>
+                        <td></td>
+                    }
+                    else if (slot.IsBooked)
+                    {
+                        <td>
+                            <strong style="color:var(--dark)">
+                                @slot.BookedByName
+                            </strong>
+                        </td>
+                        <td style="text-align:center">@slot.NumberOfPlayers</td>
+                        <td style="text-align:center">@slot.NumberOfCarts</td>
+                        <td style="color:var(--mid);font-size:0.82rem">
+                            @string.Join(" · ", slot.PlayerNames)
+                        </td>
+                        <td>
+                            <span class="status-pill status-booked">Booked</span>
+                        </td>
+                        <td>
+                            <a href="/Reservation/Cancel?reservationId=@slot.ReservationId"
+                               class="btn-action btn-action-danger me-1">
+                                Cancel
+                            </a>
+                            <a href="/Reservation/CheckIn?reservationId=@slot.ReservationId"
+                               class="btn-action btn-action-outline me-1">
+                                Check In
+                            </a>
+                            <a href="/Reservation/Modify?reservationId=@slot.ReservationId"
+                               class="btn-action btn-action-gold">
+                                Modify
+                            </a>
+                        </td>
+                    }
+                    else
+                    {
+                        <td colspan="4"
+                            style="color:var(--light-mid);font-size:0.82rem">
+                            — Available —
+                        </td>
+                        <td>
+                            <span class="status-pill status-available">Open</span>
+                        </td>
+                        <td>
+                            @if (!Model.IsLocked)
+                            {
+                                <a href="/Reservation/Book?slotId=@slot.SlotId"
+                                   class="btn-action btn-action-dark">
+                                    Book
+                                </a>
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

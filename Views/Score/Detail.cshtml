@@ -1,0 +1,291 @@
+﻿@model ClubBAIST.Models.Domain.GolfRound
+
+@{
+    ViewData["Title"] = "Round Detail";
+    var holes = (List<ClubBAIST.Models.Domain.CourseHole>)ViewBag.Holes;
+    var frontHoles = holes?.Where(h => h.HoleNumber <= 9).ToList()
+                      ?? new();
+    var backHoles = holes?.Where(h => h.HoleNumber >= 10).ToList()
+                      ?? new();
+    var frontScores = Model.HoleScores
+        .Where(s => s.HoleNumber <= 9)
+        .OrderBy(s => s.HoleNumber).ToList();
+    var backScores = Model.HoleScores
+        .Where(s => s.HoleNumber >= 10)
+        .OrderBy(s => s.HoleNumber).ToList();
+}
+
+<div class="page-header">
+    <h2>Round Detail</h2>
+    <p class="page-subtitle">
+        @Model.Member?.FullName —
+        @Model.PlayedDate.ToString("MMMM dd, yyyy")
+    </p>
+</div>
+
+<!-- Summary Cards -->
+<div class="stat-grid"
+     style="grid-template-columns:repeat(5,1fr);margin-bottom:2rem">
+    <div class="stat-card">
+        <span class="stat-label">Course</span>
+        <span style="font-family:'Cormorant Garamond',serif;
+                     font-size:1rem;color:var(--dark);
+                     display:block;margin-top:0.3rem">
+            @Model.Course?.CourseName
+        </span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Tee</span>
+        <span class="stat-value" style="font-size:1.5rem">
+            @Model.Tee?.TeeName
+        </span>
+        <span class="stat-sub">@Model.Tee?.Gender</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Rating / Slope</span>
+        <span class="stat-value" style="font-size:1.4rem">
+            @Model.Tee?.CourseRating
+        </span>
+        <span class="stat-sub">Slope @Model.Tee?.SlopeRating</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Total Score</span>
+        <span class="stat-value">@Model.TotalScore</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Differential</span>
+        <span class="stat-value stat-value-gold">
+            @Model.ScoreDifferential?.ToString("F1")
+        </span>
+        <span class="stat-sub">WHS</span>
+    </div>
+</div>
+
+<!-- Scorecard -->
+<div class="panel" style="padding:0;overflow-x:auto">
+    <div style="padding:1.5rem 2rem;border-bottom:1px solid var(--border)">
+        <span class="panel-title" style="margin:0;border:none;padding:0">
+            Scorecard
+        </span>
+    </div>
+
+    <div style="padding:1.5rem 2rem">
+
+        @* Scorecard helper macro *@
+        @{
+            string ScoreColor(int score, int par)
+            {
+                var d = score - par;
+                return d < 0 ? "#B8972E" :
+                d == 0 ? "var(--mid)" :
+                d == 1 ? "var(--dark)" : "#C0392B";
+            }
+        }
+
+        <!-- Front Nine -->
+        <div style="margin-bottom:1rem">
+            <div style="font-size:0.65rem;letter-spacing:3px;
+                        text-transform:uppercase;color:var(--gold);
+                        margin-bottom:0.8rem">
+                Front Nine
+            </div>
+            <table style="width:100%;border-collapse:collapse;font-size:0.85rem">
+                <thead>
+                    <tr style="background:var(--cream)">
+                        <th style="padding:8px 12px;text-align:left;
+                                   font-size:0.62rem;letter-spacing:2px;
+                                   text-transform:uppercase;color:var(--light-mid);
+                                   border-bottom:1px solid var(--border);
+                                   font-weight:500">
+                            Hole
+                        </th>
+                        @foreach (var h in frontHoles)
+                        {
+                            <th style="padding:8px 10px;text-align:center;
+                                           border-bottom:1px solid var(--border);
+                                           color:var(--mid);font-weight:400">
+                                @h.HoleNumber
+                            </th>
+                        }
+                        <th style="padding:8px 12px;text-align:center;
+                                   border-bottom:1px solid var(--border);
+                                   color:var(--gold);font-size:0.65px;
+                                   letter-spacing:1px;font-weight:500">
+                            OUT
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding:8px 12px;font-size:0.68rem;
+                                   letter-spacing:1.5px;text-transform:uppercase;
+                                   color:var(--light-mid)">
+                            Par
+                        </td>
+                        @foreach (var h in frontHoles)
+                        {
+                            <td style="padding:8px 10px;text-align:center;
+                                           color:var(--mid)">
+                                @h.Par
+                            </td>
+                        }
+                        <td style="padding:8px 12px;text-align:center;
+                                   font-weight:500;color:var(--mid)">
+                            @frontHoles.Sum(h => h.Par)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding:8px 12px;font-size:0.68rem;
+                                   letter-spacing:1.5px;text-transform:uppercase;
+                                   color:var(--light-mid)">
+                            Score
+                        </td>
+                        @foreach (var s in frontScores)
+                        {
+                            var hp = frontHoles
+                            .FirstOrDefault(h => h.HoleNumber == s.HoleNumber)
+                            ?.Par ?? 0;
+                            <td style="padding:8px 10px;text-align:center;
+                                           font-family:'Cormorant Garamond',serif;
+                                           font-size:1.15rem;font-weight:600;
+                                           color:@ScoreColor(s.Score, hp)">
+                                @s.Score
+                            </td>
+                        }
+                        <td style="padding:8px 12px;text-align:center;
+                                   font-family:'Cormorant Garamond',serif;
+                                   font-size:1.2rem;font-weight:600;
+                                   color:var(--dark)">
+                            @frontScores.Sum(s => s.Score)
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Back Nine -->
+        <div>
+            <div style="font-size:0.65rem;letter-spacing:3px;
+                        text-transform:uppercase;color:var(--gold);
+                        margin-bottom:0.8rem">
+                Back Nine
+            </div>
+            <table style="width:100%;border-collapse:collapse;font-size:0.85rem">
+                <thead>
+                    <tr style="background:var(--cream)">
+                        <th style="padding:8px 12px;text-align:left;
+                                   font-size:0.62rem;letter-spacing:2px;
+                                   text-transform:uppercase;color:var(--light-mid);
+                                   border-bottom:1px solid var(--border);
+                                   font-weight:500">
+                            Hole
+                        </th>
+                        @foreach (var h in backHoles)
+                        {
+                            <th style="padding:8px 10px;text-align:center;
+                                           border-bottom:1px solid var(--border);
+                                           color:var(--mid);font-weight:400">
+                                @h.HoleNumber
+                            </th>
+                        }
+                        <th style="padding:8px 12px;text-align:center;
+                                   border-bottom:1px solid var(--border);
+                                   color:var(--gold);font-size:0.65px;
+                                   letter-spacing:1px;font-weight:500">
+                            IN
+                        </th>
+                        <th style="padding:8px 12px;text-align:center;
+                                   border-bottom:1px solid var(--border);
+                                   color:var(--gold);font-size:0.65px;
+                                   letter-spacing:1px;font-weight:500">
+                            TOTAL
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding:8px 12px;font-size:0.68rem;
+                                   letter-spacing:1.5px;text-transform:uppercase;
+                                   color:var(--light-mid)">
+                            Par
+                        </td>
+                        @foreach (var h in backHoles)
+                        {
+                            <td style="padding:8px 10px;text-align:center;
+                                           color:var(--mid)">
+                                @h.Par
+                            </td>
+                        }
+                        <td style="padding:8px 12px;text-align:center;
+                                   font-weight:500;color:var(--mid)">
+                            @backHoles.Sum(h => h.Par)
+                        </td>
+                        <td style="padding:8px 12px;text-align:center;
+                                   font-weight:500;color:var(--mid)">
+                            @holes.Sum(h => h.Par)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding:8px 12px;font-size:0.68rem;
+                                   letter-spacing:1.5px;text-transform:uppercase;
+                                   color:var(--light-mid)">
+                            Score
+                        </td>
+                        @foreach (var s in backScores)
+                        {
+                            var hp = backHoles
+                            .FirstOrDefault(h => h.HoleNumber == s.HoleNumber)
+                            ?.Par ?? 0;
+                            <td style="padding:8px 10px;text-align:center;
+                                           font-family:'Cormorant Garamond',serif;
+                                           font-size:1.15rem;font-weight:600;
+                                           color:@ScoreColor(s.Score, hp)">
+                                @s.Score
+                            </td>
+                        }
+                        <td style="padding:8px 12px;text-align:center;
+                                   font-family:'Cormorant Garamond',serif;
+                                   font-size:1.2rem;font-weight:600;
+                                   color:var(--dark)">
+                            @backScores.Sum(s => s.Score)
+                        </td>
+                        <td style="padding:8px 12px;text-align:center;
+                                   font-family:'Cormorant Garamond',serif;
+                                   font-size:1.4rem;font-weight:600;
+                                   color:var(--gold)">
+                            @Model.TotalScore
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Legend -->
+        <div style="margin-top:1.5rem;display:flex;gap:2rem;
+                    flex-wrap:wrap;font-size:0.72rem">
+            <span>
+                <span style="color:var(--gold);font-weight:600">■</span>
+                Under par
+            </span>
+            <span>
+                <span style="color:var(--mid)">■</span>
+                Even par
+            </span>
+            <span>
+                <span style="color:var(--dark)">■</span>
+                Bogey
+            </span>
+            <span>
+                <span style="color:#C0392B">■</span>
+                Double bogey or worse
+            </span>
+        </div>
+    </div>
+</div>
+
+<div style="margin-top:1.5rem">
+    <a href="/Score/History?memberNumber=@Model.Member?.MemberNumber"
+       class="btn-action btn-action-outline" style="padding:10px 24px">
+        ← Back to History
+    </a>
+</div>

@@ -1,0 +1,282 @@
+﻿@model ClubBAIST.Models.ViewModels.ScoreEntryViewModel
+
+@{
+    ViewData["Title"] = "Enter Score";
+}
+
+<div class="page-header">
+    <h2>Enter Score</h2>
+    <p class="page-subtitle">World Handicap System — Round Entry</p>
+</div>
+
+@if (Model.ErrorMessage != null)
+{
+    <div class="alert alert-danger mb-3">@Model.ErrorMessage</div>
+}
+
+<form method="post" action="/Score/Enter" id="scoreForm">
+    @Html.AntiForgeryToken()
+
+    <!-- Round Info Panel -->
+    <div class="panel">
+        <div class="panel-title">Round Information</div>
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <label class="form-label">Member Number</label>
+                <input type="text" name="MemberNumber" id="MemberNumber"
+                       class="form-control" placeholder="e.g. M001"
+                       value="@Model.MemberNumber" />
+            </div>
+            <div class="col-md-3 mb-3">
+                <label class="form-label">Golf Course</label>
+                <select name="CourseId" id="CourseId" class="form-select">
+                    <option value="">— Select Course —</option>
+                    @foreach (var c in Model.Courses)
+                    {
+                        <option value="@c.CourseId">
+                            @c.CourseName @(c.IsClubCourse ? "⭐" : "")
+                        </option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3 mb-3">
+                <label class="form-label">Tee</label>
+                <select name="TeeId" id="TeeId" class="form-select">
+                    <option value="">— Select Tee —</option>
+                </select>
+            </div>
+            <div class="col-md-3 mb-3">
+                <label class="form-label">Date Played</label>
+                <input type="date" name="PlayedDate" class="form-control"
+                       value="@Model.PlayedDate.ToString("yyyy-MM-dd")" />
+            </div>
+        </div>
+
+        <!-- Course info bar -->
+        <div id="courseInfo" class="alert alert-info"
+             style="display:none;font-size:0.82rem;margin-bottom:0">
+            <span id="courseInfoText"></span>
+        </div>
+    </div>
+
+    <!-- Scorecard (loads dynamically) -->
+    <div id="scoreCard" style="display:none">
+
+        <!-- Front Nine -->
+        <div class="panel" style="padding:0">
+            <div style="padding:1.5rem 2rem;border-bottom:1px solid var(--border);
+                        display:flex;justify-content:space-between;align-items:center">
+                <span class="panel-title" style="margin:0;border:none;padding:0">
+                    Front Nine
+                </span>
+                <span id="frontTotal"
+                      style="font-family:'Cormorant Garamond',serif;
+                             font-size:1.1rem;color:var(--mid)">
+                    Out: —
+                </span>
+            </div>
+            <div style="padding:1.5rem 2rem">
+                <div class="row" id="frontNine"></div>
+            </div>
+        </div>
+
+        <!-- Back Nine -->
+        <div class="panel" style="padding:0">
+            <div style="padding:1.5rem 2rem;border-bottom:1px solid var(--border);
+                        display:flex;justify-content:space-between;align-items:center">
+                <span class="panel-title" style="margin:0;border:none;padding:0">
+                    Back Nine
+                </span>
+                <span id="backTotal"
+                      style="font-family:'Cormorant Garamond',serif;
+                             font-size:1.1rem;color:var(--mid)">
+                    In: —
+                </span>
+            </div>
+            <div style="padding:1.5rem 2rem">
+                <div class="row" id="backNine"></div>
+            </div>
+        </div>
+
+        <!-- Totals Bar -->
+        <div class="panel"
+             style="background:var(--cream);display:flex;
+                    gap:0rem;padding:0;overflow:hidden">
+            <div style="flex:1;padding:1.8rem 2rem;text-align:center;
+                        border-right:1px solid var(--border)">
+                <span style="font-size:0.62rem;letter-spacing:2.5px;
+                             text-transform:uppercase;color:var(--light-mid);
+                             display:block;margin-bottom:0.4rem">
+                    Front Nine
+                </span>
+                <span id="frontNineTotal"
+                      style="font-family:'Cormorant Garamond',serif;
+                             font-size:2.2rem;font-weight:300;color:var(--dark)">
+                    —
+                </span>
+            </div>
+            <div style="flex:1;padding:1.8rem 2rem;text-align:center;
+                        border-right:1px solid var(--border)">
+                <span style="font-size:0.62rem;letter-spacing:2.5px;
+                             text-transform:uppercase;color:var(--light-mid);
+                             display:block;margin-bottom:0.4rem">
+                    Back Nine
+                </span>
+                <span id="backNineTotal"
+                      style="font-family:'Cormorant Garamond',serif;
+                             font-size:2.2rem;font-weight:300;color:var(--dark)">
+                    —
+                </span>
+            </div>
+            <div style="flex:1;padding:1.8rem 2rem;text-align:center;
+                        background:var(--white);border-left:3px solid var(--gold)">
+                <span style="font-size:0.62rem;letter-spacing:2.5px;
+                             text-transform:uppercase;color:var(--gold);
+                             display:block;margin-bottom:0.4rem">
+                    Total Score
+                </span>
+                <span id="grandTotal"
+                      style="font-family:'Cormorant Garamond',serif;
+                             font-size:2.5rem;font-weight:300;color:var(--dark)">
+                    —
+                </span>
+            </div>
+        </div>
+
+        <!-- Submit -->
+        <div style="display:flex;gap:0.75rem;margin-top:0.5rem">
+            <button type="submit" class="btn-action btn-action-gold"
+                    style="padding:12px 36px">
+                Post Round
+            </button>
+            <a href="/Home/Index" class="btn-action btn-action-outline"
+               style="padding:12px 36px">
+                Cancel
+            </a>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        let holeData = [];
+
+        document.getElementById('CourseId').addEventListener('change', function () {
+            const courseId = this.value;
+            const teeSelect = document.getElementById('TeeId');
+            teeSelect.innerHTML = '<option value="">— Select Tee —</option>';
+            document.getElementById('scoreCard').style.display = 'none';
+            document.getElementById('courseInfo').style.display = 'none';
+            if (!courseId) return;
+
+            fetch(`/Score/GetTees?courseId=${courseId}`)
+                .then(r => r.json())
+                .then(tees => {
+                    tees.forEach(t => {
+                        const opt = document.createElement('option');
+                        opt.value = t.teeId;
+                        opt.text = t.displayName;
+                        teeSelect.appendChild(opt);
+                    });
+                });
+        });
+
+        document.getElementById('TeeId').addEventListener('change', function () {
+            const teeId = this.value;
+            if (!teeId) {
+                document.getElementById('scoreCard').style.display = 'none';
+                return;
+            }
+
+            fetch(`/Score/GetHoles?teeId=${teeId}`)
+                .then(r => r.json())
+                .then(holes => {
+                    holeData = holes;
+                    buildScoreCard(holes);
+
+                    const selectedOpt = this.options[this.selectedIndex];
+                    document.getElementById('courseInfoText').textContent =
+                        'Selected: ' + selectedOpt.text;
+                    document.getElementById('courseInfo').style.display = 'block';
+                    document.getElementById('scoreCard').style.display = 'block';
+                });
+        });
+
+        function buildScoreCard(holes) {
+            const front = holes.filter(h => h.holeNumber <= 9);
+            const back  = holes.filter(h => h.holeNumber >= 10);
+
+            document.getElementById('frontNine').innerHTML =
+                front.map(h => holeInput(h)).join('');
+            document.getElementById('backNine').innerHTML =
+                back.map(h => holeInput(h)).join('');
+
+            document.querySelectorAll('.hole-score').forEach(input => {
+                input.addEventListener('input', updateTotals);
+            });
+        }
+
+        function holeInput(h) {
+            return `
+            <div class="col-6 col-md-4 col-lg-2 mb-3">
+                <div style="background:var(--white);border:1px solid var(--border);
+                            border-radius:2px;padding:1rem;text-align:center;
+                            transition:border-color 0.15s;box-shadow:var(--shadow-sm)"
+                     onmouseover="this.style.borderColor='var(--gold)'"
+                     onmouseout="this.style.borderColor='var(--border)'">
+                    <div style="font-size:0.6rem;letter-spacing:2px;
+                                 text-transform:uppercase;color:var(--light-mid);
+                                 margin-bottom:0.2rem">
+                        Hole ${h.holeNumber}
+                    </div>
+                    <div style="font-size:0.72rem;color:var(--gold);
+                                 font-weight:500;margin-bottom:0.6rem">
+                        Par ${h.par}
+                        ${h.yardage ? `<span style="color:var(--light-mid);font-weight:300">
+                            · ${h.yardage}y</span>` : ''}
+                    </div>
+                    <input type="number"
+                           name="Scores"
+                           class="hole-score"
+                           min="1" max="20"
+                           placeholder="${h.par}"
+                           style="width:100%;text-align:center;
+                                  font-family:'Cormorant Garamond',serif;
+                                  font-size:1.4rem;font-weight:300;
+                                  border:1px solid var(--border);
+                                  border-radius:2px;padding:6px 4px;
+                                  color:var(--dark);background:var(--bg);
+                                  outline:none;transition:border-color 0.15s"
+                           onfocus="this.style.borderColor='var(--gold)'"
+                           onblur="this.style.borderColor='var(--border)'" />
+                    <div style="font-size:0.58rem;color:#ccc;
+                                 margin-top:0.4rem;letter-spacing:1px">
+                        SI ${h.strokeIndex ?? '—'}
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function updateTotals() {
+            const inputs = document.querySelectorAll('.hole-score');
+            let front = 0, back = 0, fc = 0, bc = 0;
+
+            inputs.forEach((inp, i) => {
+                const val = parseInt(inp.value) || 0;
+                if (i < 9) { front += val; if (val > 0) fc++; }
+                else        { back  += val; if (val > 0) bc++; }
+            });
+
+            document.getElementById('frontNineTotal').textContent =
+                fc > 0 ? front : '—';
+            document.getElementById('backNineTotal').textContent =
+                bc > 0 ? back : '—';
+            document.getElementById('grandTotal').textContent =
+                (fc + bc) > 0 ? (front + back) : '—';
+            document.getElementById('frontTotal').textContent =
+                fc > 0 ? `Out: ${front}` : 'Out: —';
+            document.getElementById('backTotal').textContent =
+                bc > 0 ? `In: ${back}` : 'In: —';
+        }
+    </script>
+}

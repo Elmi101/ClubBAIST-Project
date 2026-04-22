@@ -1,0 +1,142 @@
+﻿@{
+    ViewData["Title"] = "Create Tee Sheet";
+    var existingSheets =
+        (List<ClubBAIST.Models.Domain.TeeSheet>)ViewBag.ExistingSheets;
+}
+
+<div class="page-header">
+    <h2>Create Tee Sheet</h2>
+    <p class="page-subtitle">
+        Generate daily tee time slots in 8-minute intervals
+    </p>
+</div>
+
+<div class="row">
+    <div class="col-md-5">
+        <div class="panel">
+            <div class="panel-title">New Tee Sheet</div>
+
+            <form method="post" action="/Clerk/CreateTeeSheet">
+                @Html.AntiForgeryToken()
+
+                <div class="mb-3">
+                    <label class="form-label">Date</label>
+                    <input type="date" name="sheetDate" class="form-control"
+                           value="@DateTime.Today.AddDays(7)
+                                          .ToString(" yyyy-MM-dd")" />
+                    <div class="form-text">
+                        Tee sheets are created one week in advance
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <label class="form-label">Start Time</label>
+                        <input type="time" name="startTime"
+                               class="form-control" value="07:00" />
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">End Time</label>
+                        <input type="time" name="endTime"
+                               class="form-control" value="17:00" />
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">
+                        Notes
+                        <span style="color:var(--light-mid);
+                                     text-transform:none;letter-spacing:0">
+                            (optional)
+                        </span>
+                    </label>
+                    <input type="text" name="notes" class="form-control"
+                           placeholder="e.g. Regular golf day" />
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Your Member Number</label>
+                    <input type="text" name="clerkMemberNumber"
+                           class="form-control" placeholder="e.g. M001"
+                           style="max-width:160px" />
+                </div>
+
+                <button type="submit"
+                        class="btn-action btn-action-dark"
+                        style="padding:10px 28px">
+                    Generate Tee Sheet
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        <div class="panel" style="padding:0">
+            <div style="padding:1.2rem 2rem;
+                        border-bottom:1px solid var(--border)">
+                <span style="font-size:0.72rem;letter-spacing:2px;
+                             text-transform:uppercase;color:var(--mid)">
+                    Recent Tee Sheets
+                </span>
+            </div>
+
+            <table class="baist-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Day</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var sheet in existingSheets)
+                    {
+                        <tr>
+                            <td>
+                                <a href="/TeeSheet/ViewSheet?date=@sheet.SheetDate.ToString("yyyy-MM-dd")"
+                                   style="color:var(--gold);
+                                              text-decoration:none;
+                                              font-weight:500">
+                                    @sheet.SheetDate.ToString("MMM dd, yyyy")
+                                </a>
+                            </td>
+                            <td style="color:var(--mid)">
+                                @sheet.SheetDate.DayOfWeek
+                            </td>
+                            <td>
+                                <span class="status-pill
+                                        @(sheet.IsLocked
+                                                                              ? "status-cancelled"
+                                                                              : "status-active")">
+                                                                                              @(sheet.IsLocked ? "Locked" : "Open")
+                                                                                          </span>
+                                                                                      </td>
+                                                                                      <td>
+                                                                                          <a href="/TeeSheet/ViewSheet?date=@sheet.SheetDate.ToString("yyyy-MM-dd")"
+                                                                                             class="btn-action btn-action-outline me-1">
+                                                                                              View
+                                                                                          </a>
+                                                                                          <form method="post"
+                                                                                                action="/Clerk/LockTeeSheet"
+                                                                                                style="display:inline">
+                                                                                              @Html.AntiForgeryToken()
+                                                                                              <input type="hidden"
+                                                                                                     name="teeSheetId"
+                                                                                                     value="@sheet.TeeSheetId" />
+                                                                                              <button type="submit"
+                                                                                                      class="btn-action
+                                                @(sheet.IsLocked
+                                                                                            ? "btn-action-gold"
+                                                                                            : "btn-action-danger")">
+                                    @(sheet.IsLocked ? "Unlock" : "Lock")
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                                        }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

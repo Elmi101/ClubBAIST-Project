@@ -1,0 +1,94 @@
+﻿@model List<ClubBAIST.Models.Domain.Member>
+
+@{
+    ViewData["Title"] = "All Members";
+}
+
+<div class="page-header">
+    <h2>Members</h2>
+    <p class="page-subtitle">@Model.Count active members</p>
+</div>
+
+<!-- Quick Stats -->
+<div class="stat-grid"
+     style="grid-template-columns:repeat(4,1fr);margin-bottom:2rem">
+    <div class="stat-card">
+        <span class="stat-label">Gold</span>
+        <span class="stat-value stat-value-gold">
+            @Model.Count(m => m.MembershipType?.Category?.CategoryName == "Gold")
+        </span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Silver</span>
+        <span class="stat-value">
+            @Model.Count(m => m.MembershipType?.Category?.CategoryName == "Silver")
+        </span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Bronze</span>
+        <span class="stat-value">
+            @Model.Count(m => m.MembershipType?.Category?.CategoryName == "Bronze")
+        </span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Good Standing</span>
+        <span class="stat-value stat-value-green">
+            @Model.Count(m => m.IsGoodStanding)
+        </span>
+    </div>
+</div>
+
+<div class="panel" style="padding:0">
+    <table class="baist-table">
+        <thead>
+            <tr>
+                <th>Member #</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Type</th>
+                <th>Since</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Standing</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var m in Model)
+            {
+                <tr>
+                    <td style="color:var(--light-mid)">@m.MemberNumber</td>
+                    <td><strong>@m.FullName</strong></td>
+                    <td>
+                        <span class="badge badge-gold">
+                            @m.MembershipType?.Category?.CategoryName
+                        </span>
+                    </td>
+                    <td style="color:var(--mid)">
+                        @m.MembershipType?.TypeName
+                    </td>
+                    <td style="color:var(--light-mid)">
+                        @m.MemberSince.ToString("MMM yyyy")
+                    </td>
+                    <td style="color:var(--mid)">@m.Phone</td>
+                    <td style="color:var(--mid);font-size:0.78rem">
+                        @m.Email
+                    </td>
+                    <td>
+                        <span class="status-pill
+                                @(m.IsGoodStanding
+                                                              ? "status-active" : "status-cancelled")">
+                        @(m.IsGoodStanding ? "Good" : "Not Good")
+                    </span>
+                </td>
+                <td>
+                    <a href="/Finance/MyAccount?memberNumber=@m.MemberNumber"
+                       class="btn-action btn-action-outline">
+                        Account
+                    </a>
+                </td>
+            </tr>
+                        }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,184 @@
+﻿@model ClubBAIST.Models.ViewModels.ReviewApplicationViewModel
+
+@{
+    ViewData["Title"] = "Review Application #" + Model.ApplicationId;
+    var pillClass = Model.CurrentStatus switch
+    {
+        "Accepted" => "status-active",
+        "Denied" => "status-cancelled",
+        "OnHold" => "status-booked",
+        "Waitlisted" => "status-blocked",
+        _ => "status-blocked"
+    };
+}
+
+<div class="page-header">
+    <h2>Application #@Model.ApplicationId</h2>
+    <p class="page-subtitle">
+        @Model.ApplicantName —
+        <span class="status-pill @pillClass" style="font-size:0.65rem">
+            @Model.CurrentStatus
+        </span>
+    </p>
+</div>
+
+<div class="row">
+
+    <!-- Left: Applicant Details -->
+    <div class="col-md-6">
+        <div class="panel">
+            <div class="panel-title">Applicant Details</div>
+            <table class="baist-table" style="margin-bottom:0">
+                <tr>
+                    <td style="color:var(--mid);width:130px">Full Name</td>
+                    <td>
+                        <strong>@Model.ApplicantName</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="color:var(--mid)">Email</td>
+                    <td>@(Model.Email ?? "—")</td>
+                </tr>
+                <tr>
+                    <td style="color:var(--mid)">Phone</td>
+                    <td>@(Model.Phone ?? "—")</td>
+                </tr>
+                <tr>
+                    <td style="color:var(--mid)">Date of Birth</td>
+                    <td>
+                        @(Model.DateOfBirth?.ToString("MMMM dd, yyyy") ?? "—")
+                    </td>
+                </tr>
+                <tr>
+                    <td style="color:var(--mid)">Address</td>
+                    <td>@(Model.Address ?? "—")</td>
+                </tr>
+                <tr>
+                    <td style="color:var(--mid)">Occupation</td>
+                    <td>@(Model.Occupation ?? "—")</td>
+                </tr>
+                <tr>
+                    <td style="color:var(--mid)">Desired Type</td>
+                    <td>
+                        <span class="badge badge-gold">
+                            @Model.DesiredTypeName
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="color:var(--mid)">Sponsor 1</td>
+                    <td>@Model.Sponsor1Name</td>
+                </tr>
+                <tr>
+                    <td style="color:var(--mid)">Sponsor 2</td>
+                    <td>@Model.Sponsor2Name</td>
+                </tr>
+                <tr>
+                    <td style="color:var(--mid)">Submitted</td>
+                    <td>
+                        @Model.SubmittedDate.ToString("MMMM dd, yyyy")
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- Right: Committee Decision -->
+    <div class="col-md-6">
+        <div class="panel">
+            <div class="panel-title">Committee Decision</div>
+
+            <form method="post" action="/Application/ReviewDetail">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="ApplicationId"
+                       value="@Model.ApplicationId" />
+                <input type="hidden" name="ApplicantName"
+                       value="@Model.ApplicantName" />
+                <input type="hidden" name="Sponsor1Name"
+                       value="@Model.Sponsor1Name" />
+                <input type="hidden" name="Sponsor2Name"
+                       value="@Model.Sponsor2Name" />
+                <input type="hidden" name="DesiredTypeName"
+                       value="@Model.DesiredTypeName" />
+                <input type="hidden" name="CurrentStatus"
+                       value="@Model.CurrentStatus" />
+                <input type="hidden" name="SubmittedDate"
+                       value="@Model.SubmittedDate" />
+
+                <div class="mb-3">
+                    <label class="form-label">Decision</label>
+                    <select name="NewStatus" class="form-select">
+                        <option value="Pending"
+                                @(Model.CurrentStatus == "Pending"
+                                                                ? "selected" : "")>
+                            Pending
+                        </option>
+                        <option value="Accepted"
+                                @(Model.CurrentStatus == "Accepted"
+                                                                ? "selected" : "")>
+                            ✅ Accepted
+                        </option>
+                        <option value="Denied"
+                                @(Model.CurrentStatus == "Denied"
+                                                                ? "selected" : "")>
+                            ❌ Denied
+                        </option>
+                        <option value="OnHold"
+                                @(Model.CurrentStatus == "OnHold"
+                                                                ? "selected" : "")>
+                            ⏸ On Hold
+                        </option>
+                        <option value="Waitlisted"
+                                @(Model.CurrentStatus == "Waitlisted"
+                                                                ? "selected" : "")>
+                            📋 Waitlisted
+                        </option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Your Member Number</label>
+                    <input type="text" name="ReviewerMemberNumber"
+                           class="form-control" placeholder="e.g. M001"
+                           value="@Model.ReviewerMemberNumber"
+                           style="max-width:200px" />
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Review Notes</label>
+                    <textarea name="ReviewNotes" class="form-control"
+                              rows="3"
+                              placeholder="Optional notes about this decision...">@Model.Notes</textarea>
+                </div>
+
+                <div class="alert alert-warning mb-4"
+                     style="font-size:0.8rem">
+                    Selecting <strong>Accepted</strong> will automatically
+                    create a new member account with a temporary password
+                    displayed after saving.
+                </div>
+
+                @if (TempData["NewMember"] != null)
+                {
+                    <div class="alert alert-success mb-4"
+                         style="font-size:0.82rem">
+                        👤 @TempData["NewMember"]
+                    </div>
+                }
+
+                <div style="display:flex;gap:0.75rem">
+                    <button type="submit"
+                            class="btn-action btn-action-gold"
+                            style="padding:10px 28px">
+                        Save Decision
+                    </button>
+                    <a href="/Application/Review"
+                       class="btn-action btn-action-outline"
+                       style="padding:10px 28px">
+                        Back to List
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,38 @@
+﻿@{
+    ViewData["Title"] = "No Tee Sheet";
+    var todayDate = DateTime.Today.ToString("yyyy-MM-dd");
+    var displayDate = ViewBag.Date != null
+        ? ((DateTime)ViewBag.Date).ToString("dddd, MMMM dd, yyyy")
+        : DateTime.Today.ToString("dddd, MMMM dd, yyyy");
+}
+
+<div class="page-header">
+    <h2>Tee Sheet</h2>
+    <p class="page-subtitle">@displayDate</p>
+</div>
+
+<div class="panel" style="text-align:center;padding:4rem 2rem">
+    <div style="width:48px;height:2px;background:var(--gold);
+                margin:0 auto 2rem"></div>
+    <p style="font-family:'Cormorant Garamond',serif;
+              font-size:1.6rem;font-weight:300;
+              color:var(--mid);margin-bottom:0.5rem">
+        No tee sheet available
+    </p>
+    <p style="font-size:0.8rem;color:var(--light-mid);margin-bottom:2rem">
+        No tee sheet has been created for this date yet.
+    </p>
+    <div style="display:flex;gap:0.75rem;justify-content:center">
+        <a href="/TeeSheet/ViewSheet?date=@todayDate"
+           class="btn-action btn-action-dark" style="padding:10px 28px">
+            View Today
+        </a>
+        @if (User.IsInRole("Admin") || User.IsInRole("Clerk"))
+        {
+            <a href="/Clerk/CreateTeeSheet"
+               class="btn-action btn-action-gold" style="padding:10px 28px">
+                Create Tee Sheet
+            </a>
+        }
+    </div>
+</div>

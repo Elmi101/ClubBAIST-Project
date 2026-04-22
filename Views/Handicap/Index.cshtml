@@ -1,0 +1,133 @@
+﻿@model List<ClubBAIST.Models.Domain.GolfRound>
+
+@{
+    ViewData["Title"] = "Handicap Index";
+    var differentials = (List<decimal>)ViewBag.Differentials;
+    var best8 = differentials.OrderBy(d => d).Take(8).ToList();
+}
+
+<div class="page-header">
+    <h2>Handicap Index</h2>
+    <p class="page-subtitle">
+        @ViewBag.MemberName — World Handicap System
+    </p>
+</div>
+
+<!-- Handicap Display -->
+<div style="display:flex;gap:2rem;align-items:flex-start;
+            flex-wrap:wrap;margin-bottom:2rem">
+
+    <div style="background:var(--dark);color:var(--white);
+                padding:2.5rem 3rem;text-align:center;
+                border-top:3px solid var(--gold);
+                min-width:220px;box-shadow:var(--shadow-md)">
+        <span style="font-size:0.62rem;letter-spacing:4px;
+                     text-transform:uppercase;color:var(--gold);
+                     display:block;margin-bottom:0.5rem">
+            Handicap Index
+        </span>
+        <span style="font-family:'Cormorant Garamond',serif;
+                     font-size:5rem;font-weight:300;line-height:1;
+                     color:var(--white);display:block">
+            @ViewBag.HandicapIndex
+        </span>
+        <span style="font-size:0.68rem;color:#555;
+                     letter-spacing:2px;display:block;margin-top:0.5rem">
+            @ViewBag.RoundCount posted rounds
+        </span>
+    </div>
+
+    <div class="alert alert-info"
+         style="font-size:0.82rem;max-width:500px;align-self:center">
+        <strong>How it's calculated:</strong><br />
+        Your Handicap Index is the average of your best 8 Score Differentials
+        from your last 20 posted rounds.<br /><br />
+        <strong>Score Differential</strong> =
+        (Score − Course Rating) × 113 ÷ Slope Rating<br /><br />
+        Rounds marked <span style="color:var(--gold)">★</span>
+        are your best 8 and are used in the calculation.
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="panel" style="text-align:center;padding:3rem">
+        <p style="font-family:'Cormorant Garamond',serif;
+                      font-size:1.4rem;color:var(--mid);margin-bottom:1rem">
+            No rounds posted yet.
+        </p>
+        <a href="/Score/Enter"
+           class="btn-action btn-action-dark" style="padding:10px 24px">
+            Enter Your First Round
+        </a>
+    </div>
+}
+else
+{
+    <div class="panel" style="padding:0">
+        <table class="baist-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Course</th>
+                    <th>Tee</th>
+                    <th style="text-align:center">Score</th>
+                    <th style="text-align:center">Rating</th>
+                    <th style="text-align:center">Slope</th>
+                    <th style="text-align:center">Differential</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Model)
+                {
+                    var isBest = r.ScoreDifferential.HasValue &&
+                    best8.Contains(r.ScoreDifferential.Value);
+                    <tr style="@(isBest ? "background:#FDFAF0;" : "")">
+                        <td>@r.PlayedDate.ToString("MMM dd, yyyy")</td>
+                        <td>
+                            <strong>@r.Course?.CourseName</strong>
+                        </td>
+                        <td style="color:var(--mid)">@r.Tee?.TeeName</td>
+                        <td style="text-align:center">
+                            <strong style="font-family:'Cormorant Garamond',serif;
+                                                   font-size:1.1rem">
+                                @r.TotalScore
+                            </strong>
+                        </td>
+                        <td style="text-align:center;color:var(--light-mid)">
+                            @r.Tee?.CourseRating
+                        </td>
+                        <td style="text-align:center;color:var(--light-mid)">
+                            @r.Tee?.SlopeRating
+                        </td>
+                        <td style="text-align:center">
+                            @if (r.ScoreDifferential.HasValue)
+                            {
+                                <span style="@(isBest ?
+                                                                          "color:var(--gold);font-weight:500" :
+                                                                          "color:var(--mid)")">
+                        @r.ScoreDifferential.Value.ToString("F1")
+                        @if (isBest)
+                                    {
+                                        <span style="color:var(--gold)">★</span>
+                                    }
+                                </span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<div style="margin-top:1.5rem;display:flex;gap:0.75rem">
+    <a href="/Score/Enter"
+       class="btn-action btn-action-dark" style="padding:10px 24px">
+        Enter New Round
+    </a>
+    <a href="/Score/History?memberNumber=@ViewBag.MemberNumber"
+       class="btn-action btn-action-outline" style="padding:10px 24px">
+        Full Score History
+    </a>
+</div>

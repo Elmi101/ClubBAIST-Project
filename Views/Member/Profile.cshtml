@@ -1,0 +1,178 @@
+﻿@model ClubBAIST.Models.Domain.Member
+
+@{
+    ViewData["Title"] = "Member Profile";
+}
+
+<div class="page-header">
+    <h2>@Model.FullName</h2>
+    <p class="page-subtitle">
+        @Model.MemberNumber ·
+        @Model.MembershipType?.Category?.CategoryName —
+        @Model.MembershipType?.TypeName
+    </p>
+</div>
+
+<!-- Stats Row -->
+<div class="stat-grid"
+     style="grid-template-columns:repeat(4,1fr);margin-bottom:2rem">
+    <div class="stat-card">
+        <span class="stat-label">Member Number</span>
+        <span class="stat-value stat-value-gold"
+              style="font-size:1.8rem">
+            @Model.MemberNumber
+        </span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Category</span>
+        <span class="stat-value" style="font-size:1.4rem">
+            @Model.MembershipType?.Category?.CategoryName
+        </span>
+        <span class="stat-sub">@Model.MembershipType?.TypeName</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Active Bookings</span>
+        <span class="stat-value">@ViewBag.ReservationCount</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Rounds Posted</span>
+        <span class="stat-value">@ViewBag.RoundCount</span>
+    </div>
+</div>
+
+<div class="row">
+
+    <!-- Member Info -->
+    <div class="col-md-4">
+        <div class="panel">
+            <div class="panel-title">Membership</div>
+            <table class="baist-table" style="margin-bottom:0">
+                <tr>
+                    <td style="color:var(--mid);width:110px">
+                        Member Since
+                    </td>
+                    <td>@Model.MemberSince.ToString("MMMM yyyy")</td>
+                </tr>
+                <tr>
+                    <td style="color:var(--mid)">Years</td>
+                    <td>@Model.YearsAsMember year(s)</td>
+                </tr>
+                <tr>
+                    <td style="color:var(--mid)">Tee Access</td>
+                    <td>
+                        <span class="badge badge-gold">
+                            @(Model.MembershipType?.TeeTimeRestriction
+                                                        ?? "None")
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="color:var(--mid)">Golf</td>
+                    <td>
+                        <span class="status-pill
+                            @(Model.MembershipType?.HasGolfPrivileges == true
+                                                              ? "status-active" : "status-cancelled")">
+                            @(Model.MembershipType?.HasGolfPrivileges == true
+                                                        ? "Privileges" : "No Golf")
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="color:var(--mid)">Standing</td>
+                    <td>
+                        <span class="status-pill
+                            @(Model.IsGoodStanding
+                                                              ? "status-active" : "status-cancelled")">
+                            @(Model.IsGoodStanding
+                                                        ? "Good Standing" : "Not Good Standing")
+                        </span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- Contact Info -->
+    <div class="col-md-4">
+        <div class="panel">
+            <div class="panel-title">Contact</div>
+            <table class="baist-table" style="margin-bottom:0">
+                <tr>
+                    <td style="color:var(--mid);width:100px">Phone</td>
+                    <td>@(Model.Phone ?? "—")</td>
+                </tr>
+                <tr>
+                    <td style="color:var(--mid)">Alt Phone</td>
+                    <td>@(Model.AlternatePhone ?? "—")</td>
+                </tr>
+                <tr>
+                    <td style="color:var(--mid)">Email</td>
+                    <td style="font-size:0.82rem">
+                        @(Model.Email ?? "—")
+                    </td>
+                </tr>
+                <tr>
+                    <td style="color:var(--mid)">Address</td>
+                    <td>@(Model.Address ?? "—")</td>
+                </tr>
+                <tr>
+                    <td style="color:var(--mid)">Postal</td>
+                    <td>@(Model.PostalCode ?? "—")</td>
+                </tr>
+                <tr>
+                    <td style="color:var(--mid)">Date of Birth</td>
+                    <td>
+                        @(Model.DateOfBirth?.ToString("MMMM dd, yyyy")
+                                                ?? "—")
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="col-md-4">
+        <div class="panel">
+            <div class="panel-title">Employment</div>
+            <table class="baist-table" style="margin-bottom:1.5rem">
+                <tr>
+                    <td style="color:var(--mid);width:100px">
+                        Occupation
+                    </td>
+                    <td>@(Model.Occupation ?? "—")</td>
+                </tr>
+                <tr>
+                    <td style="color:var(--mid)">Company</td>
+                    <td>@(Model.CompanyName ?? "—")</td>
+                </tr>
+                <tr>
+                    <td style="color:var(--mid)">Work Phone</td>
+                    <td>@(Model.CompanyPhone ?? "—")</td>
+                </tr>
+            </table>
+
+            <div style="display:flex;flex-direction:column;gap:0.5rem">
+                <a href="/TeeSheet/ViewSheet?date=@DateTime.Today.ToString("yyyy-MM-dd")"
+                   class="btn-action btn-action-dark"
+                   style="padding:10px 20px;text-align:center">
+                    📅 View Tee Sheet
+                </a>
+                <a href="/Score/History?memberNumber=@Model.MemberNumber"
+                   class="btn-action btn-action-outline"
+                   style="padding:10px 20px;text-align:center">
+                    🏌️ Score History
+                </a>
+                <a href="/Handicap/Index?memberNumber=@Model.MemberNumber"
+                   class="btn-action btn-action-outline"
+                   style="padding:10px 20px;text-align:center">
+                    📊 Handicap Index
+                </a>
+                <a href="/Finance/MyAccount?memberNumber=@Model.MemberNumber"
+                   class="btn-action btn-action-outline"
+                   style="padding:10px 20px;text-align:center">
+                    💳 My Account
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

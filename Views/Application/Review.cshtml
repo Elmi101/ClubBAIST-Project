@@ -1,0 +1,123 @@
+﻿@model List<ClubBAIST.Models.Domain.MembershipApplication>
+
+@{
+    ViewData["Title"] = "Review Applications";
+    var pending = Model.Count(a => a.Status == "Pending");
+    var accepted = Model.Count(a => a.Status == "Accepted");
+    var denied = Model.Count(a => a.Status == "Denied");
+    var waitlisted = Model.Count(a => a.Status == "Waitlisted");
+    var onhold = Model.Count(a => a.Status == "OnHold");
+}
+
+<div class="page-header">
+    <h2>Membership Applications</h2>
+    <p class="page-subtitle">Committee Review Panel</p>
+</div>
+
+<!-- Summary Stats -->
+<div class="stat-grid"
+     style="grid-template-columns:repeat(5,1fr);margin-bottom:2rem">
+    <div class="stat-card">
+        <span class="stat-label">Total</span>
+        <span class="stat-value">@Model.Count</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Pending</span>
+        <span class="stat-value" style="color:var(--mid)">@pending</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Accepted</span>
+        <span class="stat-value stat-value-green">@accepted</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Waitlisted</span>
+        <span class="stat-value" style="color:#1A5276">@waitlisted</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Denied</span>
+        <span class="stat-value stat-value-red">@denied</span>
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="panel" style="text-align:center;padding:3rem">
+        <p style="font-family:'Cormorant Garamond',serif;
+                      font-size:1.4rem;color:var(--mid)">
+            No applications on file.
+        </p>
+    </div>
+}
+else
+{
+    <div class="panel" style="padding:0">
+        <table class="baist-table">
+            <thead>
+                <tr>
+                    <th style="width:50px">#</th>
+                    <th>Applicant</th>
+                    <th>Desired Type</th>
+                    <th>Sponsor 1</th>
+                    <th>Sponsor 2</th>
+                    <th>Submitted</th>
+                    <th style="width:110px">Status</th>
+                    <th style="width:80px"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var app in Model)
+                {
+                    var pillClass = app.Status switch
+                    {
+                        "Accepted" => "status-active",
+                        "Denied" => "status-cancelled",
+                        "OnHold" => "status-booked",
+                        "Waitlisted" => "status-blocked",
+                        _ => "status-blocked"
+                    };
+
+                    <tr>
+                        <td style="color:var(--light-mid)">
+                            @app.ApplicationId
+                        </td>
+                        <td>
+                            <strong>
+                                @app.FirstName @app.LastName
+                            </strong>
+                            @if (!string.IsNullOrEmpty(app.Email))
+                            {
+                                <div style="font-size:0.75rem;
+                                                         color:var(--light-mid)">
+                                    @app.Email
+                                </div>
+                            }
+                        </td>
+                        <td style="color:var(--mid)">
+                            @app.DesiredType?.TypeName
+                        </td>
+                        <td style="color:var(--mid);font-size:0.82rem">
+                            @app.Sponsor1?.FullName
+                        </td>
+                        <td style="color:var(--mid);font-size:0.82rem">
+                            @app.Sponsor2?.FullName
+                        </td>
+                        <td style="color:var(--light-mid)">
+                            @app.SubmittedDate.ToString("MMM dd, yyyy")
+                        </td>
+                        <td>
+                            <span class="status-pill @pillClass">
+                                @app.Status
+                            </span>
+                        </td>
+                        <td>
+                            <a href="/Application/ReviewDetail?id=@app.ApplicationId"
+                               class="btn-action btn-action-outline">
+                                Review
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

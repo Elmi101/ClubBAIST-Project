@@ -1,0 +1,40 @@
+﻿@{
+    ViewData["Title"] = "Application Submitted";
+}
+
+<div style="max-width:600px;margin:4rem auto;text-align:center">
+    <div style="width:48px;height:2px;background:var(--gold);
+                margin:0 auto 2rem"></div>
+
+    <h2 style="font-family:'Cormorant Garamond',serif;font-weight:300;
+               font-size:2.5rem;color:var(--dark);margin-bottom:1rem">
+        Application Submitted
+    </h2>
+
+    <p style="color:var(--mid);line-height:1.8;
+              margin-bottom:0.5rem;font-size:0.9rem">
+        @ViewBag.Message
+    </p>
+
+    <div style="width:40px;height:1px;background:var(--border);
+                margin:2rem auto"></div>
+
+    <p style="font-size:0.82rem;color:var(--light-mid);
+              line-height:1.9;margin-bottom:2rem">
+        The membership committee reviews applications once per month.
+        You will be contacted regarding the outcome of your application.<br />
+        You can check your application status at any time using your
+        last name and phone number.
+    </p>
+
+    <div style="display:flex;gap:1rem;justify-content:center">
+        <a href="/Application/Status"
+           class="btn-action btn-action-dark" style="padding:12px 28px">
+            Check Status
+        </a>
+        <a href="/Home/Index"
+           class="btn-action btn-action-outline" style="padding:12px 28px">
+            Return Home
+        </a>
+    </div>
+</div>
